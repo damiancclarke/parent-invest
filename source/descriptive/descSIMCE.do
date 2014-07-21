@@ -209,14 +209,35 @@ if `investment'==1 {
 
 
 	insheet using "$DAT/SIMCE2008/csv/4Parents.csv", delim(";") clear
+	rename preg03_8 ComputerAvailability
+	rename preg03_9 InternetAvailability
 	rename preg10_1 PreschoolNever
 	rename preg10_2 Preschool0_2
 	rename preg10_3 Preschool2_3 
 	rename preg10_4 Preschool3_4 
 	rename preg10_5 Preschool4_5
 	rename preg10_6 Preschool5_6
-
+	gen expectations=.
+	foreach num of numlist 1(1)8 {
+		replace expectations=`num' if preg15_`num'==1
+	}
+	
 	insheet using "$DAT/SIMCE2009/csv/4Parents.csv", delim(";") clear
+	rename p07_1_7 ComputerAvailability
+	rename p07_1_8 InternetAvailability
+	rename p15_1 SalaCuna 
+	rename p15_2 PreSchool1
+	rename p15_3 PreSchool2
+	rename p15_4 PreKinder
+	rename p15_5 Kindergarten
+	
 	insheet using "$DAT/SIMCE2010/csv/4Parents.csv", delim(";") clear
-
+	rename p07_1_7 ComputerAvailability
+	rename p07_1_8 InternetAvailability
+	rename p16_1 SalaCuna 
+	rename p16_2 PreSchool1
+	rename p16_3 PreSchool2
+	rename p16_4 PreKinder
+	rename p16_5 Kindergarten
+	rename p26 Expectations
 }
