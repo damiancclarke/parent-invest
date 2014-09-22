@@ -9,11 +9,24 @@ import qgis.utils
 #===============================================================================
 #=== (1) Set locations of data
 #===============================================================================
-comloc = '~/database/ChileRegiones/GeoRefs/division_comunal'
-coploc = '~/investigacion/2014/ParentalInvestments/data/Geo'
+comloc = '~/database/ChileRegiones/GeoRefs/division_comunal/'
+coploc = '~/investigacion/2014/ParentalInvestments/data/Copper/USGS/'
 
 #===============================================================================
-#=== (1) Load raster layers
+#=== (2) Load raster layers
 #===============================================================================
-comlayer = QgsVectorLayer(coploc + 'division_comunal', 'coms', 'ogr')
+comlayer = QgsVectorLayer(comloc + 'division_comunal.shp', 'coms', 'ogr')
+midlayer = QgsVectorLayer(comloc + 'comuna_centroids.shp', 'cent', 'ogr')
+
+copper = 'file//' + coploc + 'Deposits.csv?delimiter=%s&xField=%s&yField=%s&crs=epsg:4326" \
+% (",", "latitude", "longitude")'
+coplayer = QgsVectorLayer(copper, 'copp', 'delimitedtext')
+
 print comlayer
+print midlayer
+print coplayer
+
+#===============================================================================
+#=== (3) Close
+#===============================================================================
+QgsApplication.exitQgis()
