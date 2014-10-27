@@ -58,7 +58,9 @@ foreach m of local minenames {
 ********************************************************************************
 *** (3) Import comuna distances, find number of mines within 300, 400, 500, 600
 ********************************************************************************
-insheet using "$DAT/ComunaMine_Distance.csv", comma names clear
+*insheet using "$DAT/ComunaMine_Distance.csv", delimit(";") names clear
+*cap drop v28
+use "$DAT/ComunaMine_Distance", clear
 
 ds id, not
 local mines `r(varlist)'
@@ -135,6 +137,14 @@ foreach num of numlist 300 400 500 600 {
 	label var Ore`num' "Ore removed in 2005 in mines within `num'km of Comuna"
 	label var GradeOre`num' "Tonnage*grade in 2005 in mines within `num'km of Comuna"
 }
+
+bys id: gen n=_n
+drop if n==2 // Aisen repeated
+drop n
+
+replace id=13106 if id==1310
+gen JobComuna=id
+label var JobComuna "Unique link to SAFP data"
 
 label data "Copper intensity by comuna based on distance and USGS values"
 save "$OUT/CopperTreatment", replace
