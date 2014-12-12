@@ -47,8 +47,14 @@ log using "$LOG/casenPrep.txt", text replace
     rename p          provincia
     rename comu       comuna
     rename o          person
+    rename expr       WTregional
+    rename expc       WTcomunal
+    rename numper     familySize
+    rename esc        educYrs
 
-
+    gen rural      = z-1
+    *gen employed   = activ==1 if activ!=3
+    *gen unemployed = activ==2 if activ!=3
 }
 
 
