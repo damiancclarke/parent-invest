@@ -3,6 +3,12 @@
 
 This file takes raw CASEN data files from
 
+
+* Note: sufficient to generate individual person identifiers:
+    bys segmento f (o): gen n=_n 
+  now id would be: segmento f n, where n==o
+
+contact: damian.clarke@economics.ox.ac.uk
 */
 
 vers 11
@@ -24,7 +30,8 @@ log using "$LOG/casenPrep.txt", text replace
 ********************************************************************************
 *** (2) Open files, generate variables
 ********************************************************************************
-foreach y of numlist 1990(2)2000 2003(3)2009 2011 {
+*foreach y of numlist 1990(2)2000 2003(3)2009 2011 {
+ foreach y of numlist 2003 {
     if `y'==2009 local ap "stata"
     if `y'==2011 local ap "stata_06092012"
     
@@ -33,9 +40,21 @@ foreach y of numlist 1990(2)2000 2003(3)2009 2011 {
     local obs = `r(N)'
     levelsof comu
     local ncom : word count `r(levels)'
-
     dis "In `y' there are `obs' observations in `ncom' comunas."
+    
+
+    rename r          region
+    rename p          provincia
+    rename comu       comuna
+    rename o          person
+
+
 }
+
+
+
+
+
 ********************************************************************************
 *** (X) Close
 ********************************************************************************
