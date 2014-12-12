@@ -89,7 +89,7 @@ log using "$LOG/casenPrep.txt", text replace
     
     #delimit ;
     keep region comuna person WT* familySize educYrs jobArea jobType
-    gender age incomeJob rural;
+    gender age incomeJob rural surveyYr;
     #delimit cr
 
     tempfile f`y'
