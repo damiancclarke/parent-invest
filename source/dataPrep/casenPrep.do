@@ -89,9 +89,10 @@ foreach y of numlist 1998(2)2000 2003(3)2009 2011 {
     rename edad       age
     rename yopraj     incomeJob
     *rename ytotaj     incomeTotal
-    rename ecivil     marritalStat
+    rename ecivil     maritalStat
     rename `1'        attendSchool
     
+    cap gen hogar  = 1
     gen rural      = z-1
     gen employed   = activ==1 if activ<3
     gen unemployed = activ==2 if activ<3
@@ -101,7 +102,7 @@ foreach y of numlist 1998(2)2000 2003(3)2009 2011 {
     #delimit ;
     keep region comuna person WT* familySize educYrs jobArea jobType
     gender age incomeJob rural surveyYr marritalStat employed unemployed
-    inactive household seg attendSchool;
+    inactive household segmento attendSchool hogar;
     #delimit cr
 
     tempfile f`y'
@@ -116,10 +117,32 @@ append using `f1998' `f2000' `f2003' `f2006' `f2009' `f2011'
 ********************************************************************************
 *** (3) Label Variables
 ********************************************************************************
+egen houseid = group(surveyYr region comuna segmento hogar household)
+
+lab var region     "Region (highest level of geographic variation, 1-15)"
+lab var comuna     "Comuna (lowest level of geographic variation, 1-346)"
+lab var segmento   "Segmento (necessary for unique household id)"
+lab var person     "Person id (unique within houseid)"
+lab var WTregion   "Regional sampling weight"
+lab var WTcomuna   "Comunal sampling weight"
+lab var familySize "Number of people in the household"
+lab var gender     "1 if male, 2 if female"
+lab var age        "Age in years"
+lab var maritalS   "Marital Status"
+lab var attendSch  "Person currently attends school"
+lab var educYrs    "Years of education completed"
+lab var incomeJob  "Income from principal occupation"
+lab var hogar      "House number in household group"
+lab var rural      "Binary variable for rural (1 if rural)"
 lab var employed   "1 if active, 0 if unemployed"
 lab var unemployed "1 if unemployed, 0 if active"
 lab var inactive   "1 if inactive in labor market, 0 if active/unemployed"
+lab var syrveyYr   "Year of CASEN survey"   
 lab var household  "Household identifier (unique by year)"
+
+********************************************************************************
+*** (4) Correctly code comunas to merge with mine data
+********************************************************************************
 
 
 ********************************************************************************
