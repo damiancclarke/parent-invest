@@ -154,7 +154,8 @@ lab var comnew     "Comuna code for merge to mining data"
 rename comnew id
 
 merge m:1 id using "$COP/CopperTreatment"
-
+drop if _merge==2
+drop _merge
 
 ********************************************************************************
 *** (X) Close
