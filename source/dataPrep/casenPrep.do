@@ -41,6 +41,7 @@ global DAT "~/database/Casen"
 global OUT "~/investigacion/2014/ParentalInvestments/data/labor/CASEN"
 global LOG "~/investigacion/2014/ParentalInvestments/log"
 global COM "~/investigacion/2014/ParentalInvestments/data/Geo"
+global COP "~/investigacion/2014/ParentalInvestments/data/Copper"
 
 cap mkdir "$OUT"
 log using "$LOG/casenPrep.txt", text replace
@@ -144,10 +145,20 @@ lab var household  "Household identifier (unique by year)"
 ********************************************************************************
 *** (4) Correctly code comunas to merge with mine data
 ********************************************************************************
-merge 1:1 comuna surveyYr using "$COM/comunaNames"
+merge m:1 comuna surveyYr using "$COM/comunaNames"
+drop if _merge==1
+drop _merge
+
+lab var cname      "Comuna Name (string)"
+lab var comnew     "Comuna code for merge to mining data"
+rename comnew id
+
+merge m:1 id using "$COP/CopperTreatment"
+
 
 ********************************************************************************
 *** (X) Close
 ********************************************************************************
+lab dat "Pooled CASEN 1998-2011 merged with Mine intensity data (2005)"
 save "$OUT/CASENmerged", replace
 log close
