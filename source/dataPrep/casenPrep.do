@@ -40,6 +40,7 @@ cap log close
 global DAT "~/database/Casen"
 global OUT "~/investigacion/2014/ParentalInvestments/data/labor/CASEN"
 global LOG "~/investigacion/2014/ParentalInvestments/log"
+global COM "~/investigacion/2014/ParentalInvestments/data/Geo"
 
 cap mkdir "$OUT"
 log using "$LOG/casenPrep.txt", text replace
@@ -101,7 +102,7 @@ foreach y of numlist 1998(2)2000 2003(3)2009 2011 {
 
     #delimit ;
     keep region comuna person WT* familySize educYrs jobArea jobType
-    gender age incomeJob rural surveyYr marritalStat employed unemployed
+    gender age incomeJob rural surveyYr maritalStat employed unemployed
     inactive household segmento attendSchool hogar;
     #delimit cr
 
@@ -137,13 +138,13 @@ lab var rural      "Binary variable for rural (1 if rural)"
 lab var employed   "1 if active, 0 if unemployed"
 lab var unemployed "1 if unemployed, 0 if active"
 lab var inactive   "1 if inactive in labor market, 0 if active/unemployed"
-lab var syrveyYr   "Year of CASEN survey"   
+lab var surveyYr   "Year of CASEN survey"   
 lab var household  "Household identifier (unique by year)"
 
 ********************************************************************************
 *** (4) Correctly code comunas to merge with mine data
 ********************************************************************************
-
+merge 1:1 comuna surveyYr using "$COM/comunaNames"
 
 ********************************************************************************
 *** (X) Close
