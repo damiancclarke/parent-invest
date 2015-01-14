@@ -29,7 +29,7 @@ global LOG "~/investigacion/2014/ParentalInvestments/log"
 global GRA "~/investigacion/2014/ParentalInvestments/results/descriptives/mines"
 
 log using "$LOG/minePrep.txt", text replace
-
+local distance 25 50 75 100 200
 
 ********************************************************************************
 *** (2) Import mine tonnage, save in local along with mine names
@@ -66,15 +66,14 @@ ds id, not
 local mines `r(varlist)'
 foreach var of local mines {
 	replace `var'=`var'/1000
-	foreach num of numlist 300 400 500 600 {
+	foreach num of local distance {
 		gen `var'`num'=`var'<`num'
 	}
 }
 
-egen Num300=rowtotal(*300)
-egen Num400=rowtotal(*400)
-egen Num500=rowtotal(*500)
-egen Num600=rowtotal(*600)
+foreach num of local distance {
+    egen Num`num'=rowtotal(*`num')
+}
 
 ********************************************************************************
 *** (4) Using locals from above, create interactions with Ore, and Ore*grade
@@ -83,40 +82,36 @@ tokenize `tonnes'
 local i=1
 foreach m of local minenames {
 	dis "Mine is `m', tonnage is ``i''"
-	gen `m'300_Ore=`m'300*``i''
-	gen `m'400_Ore=`m'400*``i''
-	gen `m'500_Ore=`m'500*``i''
-	gen `m'600_Ore=`m'600*``i''
+  foreach num of local distance {
+      gen `m'`num'_Ore=`m'`num'*``i''
+  }
 	local ++i
 }
 
-egen Ore300=rowtotal(*300_Ore)
-egen Ore400=rowtotal(*400_Ore)
-egen Ore500=rowtotal(*500_Ore)
-egen Ore600=rowtotal(*600_Ore)
+foreach num of local distance {
+    egen Ore`num'=rowtotal(*`num'_Ore)
+}
 
 tokenize `grades'
 local i=1
 foreach m of local minenames {
 	dis "Mine is `m', Grade is ``i''"
-	gen `m'300_GradeOre=`m'300_Ore*``i''
-	gen `m'400_GradeOre=`m'400_Ore*``i''
-	gen `m'500_GradeOre=`m'500_Ore*``i''
-	gen `m'600_GradeOre=`m'600_Ore*``i''
+  foreach num of local distance {
+      gen `m'`num'_GradeOre=`m'`num'_Ore*``i''
+  }
 	local ++i
 }
 
-egen GradeOre300=rowtotal(*300_GradeOre)
-egen GradeOre400=rowtotal(*400_GradeOre)
-egen GradeOre500=rowtotal(*500_GradeOre)
-egen GradeOre600=rowtotal(*600_GradeOre)
+foreach num of local distance {
+    egen GradeOre`num'=rowtotal(*`num'_GradeOre)
+}
 
 keep id Num* Ore* GradeOre*
 
 ********************************************************************************
 *** (5) Descriptives
 ********************************************************************************
-foreach num of numlist 300 400 500 600 {
+foreach num of local distance {
 	histogram Num`num', saving(N`num') freq
 	histogram Ore`num', saving(O`num') freq
 	histogram GradeOre`num', saving(G`num') freq
@@ -132,7 +127,7 @@ foreach num of numlist 300 400 500 600 {
 ********************************************************************************
 *** (6) Save, clean up
 ********************************************************************************
-foreach num of numlist 300 400 500 600 {
+foreach num of local distance {
 	label var Num`num' "Number of mines within `num'km of the Comuna"
 	label var Ore`num' "Ore removed in 2005 in mines within `num'km of Comuna"
 	label var GradeOre`num' "Tonnage*grade in 2005 in mines within `num'km of Comuna"
