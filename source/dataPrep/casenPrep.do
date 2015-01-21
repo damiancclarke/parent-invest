@@ -165,6 +165,8 @@ if `arsenic'==1 {
     drop _merge
     foreach var of varlist c3057 c5870 c7177 c7879 c8087 c8894 {
         bys region: egen m=mean(`var')
+        cap drop cflag
+        gen cflag=m!=.&var==.
         replace `var'=m if `var'==.
         drop m
 
