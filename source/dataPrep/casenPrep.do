@@ -162,9 +162,13 @@ if `copper'==1 {
 }
 if `arsenic'==1 {
     merge m:1 id using "$COM/arsenicNames"
-
+    drop _merge
+    foreach var of varlist c3057 c5870 c7177 c7879 c8087 c8894 {
+        bys region: egen m=mean(`var')
+        replace `var'=m if `var'==.
+        drop m
+    }
 }
-exit
 
 ********************************************************************************
 *** (X) Close
