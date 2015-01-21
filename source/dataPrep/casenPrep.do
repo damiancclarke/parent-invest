@@ -46,6 +46,8 @@ global COP "~/investigacion/2014/ParentalInvestments/data/Copper"
 cap mkdir "$OUT"
 log using "$LOG/casenPrep.txt", text replace
 
+local copper  = 0
+local arsenic = 1
 
 ********************************************************************************
 *** (2) Open files, generate variables
@@ -153,13 +155,26 @@ lab var cname      "Comuna Name (string)"
 lab var comnew     "Comuna code for merge to mining data"
 rename comnew id
 
-merge m:1 id using "$COP/CopperTreatment"
-drop if _merge==2
-drop _merge
+if `copper'==1 {
+    merge m:1 id using "$COP/CopperTreatment"
+    drop if _merge==2
+    drop _merge
+}
+if `arsenic'==1 {
+    merge m:1 id using "$COM/arsenicNames"
+
+}
+exit
 
 ********************************************************************************
 *** (X) Close
 ********************************************************************************
-lab dat "Pooled CASEN 1998-2011 merged with Mine intensity data (2005)"
-save "$OUT/CASENmerged", replace
+if `copper'==1 {
+    lab dat "Pooled CASEN 1998-2011 merged with Mine intensity data (2005)"
+    save "$OUT/CASENmerged", replace
+}
+if `arsenic'==1 {
+    lab dat "Pooled CASEN 1998-2011 merged with arsenic data (Fereccio et al.)"
+    save "$OUT/CASENarsenic", replace
+}
 log close
