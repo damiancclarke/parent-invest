@@ -166,7 +166,7 @@ if `arsenic'==1 {
     foreach var of varlist c3057 c5870 c7177 c7879 c8087 c8894 {
         bys region: egen m=mean(`var')
         cap drop cflag
-        gen cflag=m!=.&var==.
+        gen cflag=m!=.&`var'==.
         replace `var'=m if `var'==.
         drop m
 
@@ -178,6 +178,7 @@ if `arsenic'==1 {
     lab var c7879 "Concentration of Arsenic in comuna from 1978-1979"
     lab var c8087 "Concentration of Arsenic in comuna from 1980-1987"
     lab var c8894 "Concentration of Arsenic in comuna from 1988-1994"
+    lab var cflag "Replaced missing concentration with comuna average"
 }
 
 ********************************************************************************
