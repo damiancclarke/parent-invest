@@ -26,6 +26,7 @@ global DAT "~/database/SAFP"
 global OUT "~/investigacion/2014/ParentalInvestments/data/labor/SAFP"
 global LOG "~/investigacion/2014/ParentalInvestments/log"
 global GRA "~/investigacion/2014/ParentalInvestments/results/descriptives/Income" 
+global GEO "~/investigacion/2014/ParentalInvestments/data/Geo"
 
 log using "$LOG/laborPrep.txt", text replace
 
@@ -109,6 +110,20 @@ graph export "$GRA/Income.eps", as(eps) replace
 
 
 ********************************************************************************
-*** (4) Cleaning up
+*** (4) Merging to make SAFP database with Arsenic data
 ********************************************************************************
+use "$OUT/Affiliates.dta", clear
+merge 1:m ID using "$OUT/Incomes"
+drop if _merge==1
+drop _merge
+
+rename ResComuna id
+merge m:1 id using "$GEO/arsenicNames"
+rename id ResComuna
+
+********************************************************************************
+*** (5) Cleaning up
+********************************************************************************
+lab data "SAFP data: all affiliates and payments, crossed with arsenic data"
+save "$OUT/SAFParsenic.dta", replace
 log close
