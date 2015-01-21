@@ -167,6 +167,8 @@ if `arsenic'==1 {
         bys region: egen m=mean(`var')
         replace `var'=m if `var'==.
         drop m
+
+        replace `var'=0 if `var'==.&region!=4
     }
 }
 
@@ -181,4 +183,6 @@ if `arsenic'==1 {
     lab dat "Pooled CASEN 1998-2011 merged with arsenic data (Fereccio et al.)"
     save "$OUT/CASENarsenic", replace
 }
+
+
 log close
