@@ -113,13 +113,33 @@ graph export "$GRA/Income.eps", as(eps) replace
 *** (4) Merging to make SAFP database with Arsenic data
 ********************************************************************************
 use "$OUT/Affiliates.dta", clear
+gen RegionSAFP=floor(JobComuna/1000)
 merge 1:m ID using "$OUT/Incomes"
 drop if _merge==1
 drop _merge
 
 rename ResComuna id
 merge m:1 id using "$GEO/arsenicNames"
+drop _merge
 rename id ResComuna
+
+foreach var of varlist c3057 c5870 c7177 c7879 c8087 c8894 { 
+    bys region: egen m=mean(`var') 
+    cap drop cflag
+    gen cflag=m!=.&`var'==.
+    replace `var'=m if `var'==.
+    drop m
+
+    replace `var'=0 if `var'==.&RegionSAFP!=4
+}
+lab var c3057 "Concentration of Arsenic in comuna from 1930-1957"
+lab var c5870 "Concentration of Arsenic in comuna from 1958-1970"
+lab var c7177 "Concentration of Arsenic in comuna from 1971-1977"
+lab var c7879 "Concentration of Arsenic in comuna from 1978-1979"
+lab var c8087 "Concentration of Arsenic in comuna from 1980-1987"
+lab var c8894 "Concentration of Arsenic in comuna from 1988-1994"
+lab var cflag "Replaced missing concentration of arsenic with comuna average"
+
 
 ********************************************************************************
 *** (5) Cleaning up
