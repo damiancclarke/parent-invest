@@ -113,10 +113,10 @@ graph export "$GRA/Income.eps", as(eps) replace
 *** (4) Merging to make SAFP database with Arsenic data
 ********************************************************************************
 use "$OUT/Affiliates.dta", clear
-gen RegionSAFP=floor(JobComuna/1000)
 merge 1:m ID using "$OUT/Incomes"
 drop if _merge==1
 drop _merge
+gen RegionSAFP=floor(JobComuna/1000)
 
 rename ResComuna id
 merge m:1 id using "$GEO/arsenicNames"
