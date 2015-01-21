@@ -170,6 +170,12 @@ if `arsenic'==1 {
 
         replace `var'=0 if `var'==.&region!=4
     }
+    lab var c3057 "Concentration of Arsenic in comuna from 1930-1957"
+    lab var c5870 "Concentration of Arsenic in comuna from 1958-1970"
+    lab var c7177 "Concentration of Arsenic in comuna from 1971-1977"
+    lab var c7879 "Concentration of Arsenic in comuna from 1978-1979"
+    lab var c8087 "Concentration of Arsenic in comuna from 1980-1987"
+    lab var c8894 "Concentration of Arsenic in comuna from 1988-1994"
 }
 
 ********************************************************************************
