@@ -177,24 +177,15 @@ rename comnew id
 
 merge m:1 id using "$COM/arsenicNames"
 drop _merge
-foreach var of varlist c3057 c5870 c7177 c7879 c8087 c8894 {
-    bys region: egen m=mean(`var')
-    cap drop cflag
-    gen cflag=m!=.&`var'==.
-    replace `var'=m if `var'==.
-    drop m
-
-    replace `var'=0 if `var'==.&region!=4
-}
 lab var c3057 "Concentration of Arsenic in comuna from 1930-1957"
 lab var c5870 "Concentration of Arsenic in comuna from 1958-1970"
 lab var c7177 "Concentration of Arsenic in comuna from 1971-1977"
 lab var c7879 "Concentration of Arsenic in comuna from 1978-1979"
 lab var c8087 "Concentration of Arsenic in comuna from 1980-1987"
 lab var c8894 "Concentration of Arsenic in comuna from 1988-1994"
-lab var cflag "Replaced missing concentration with comuna average"
 
-
+gen regionBirth=floor(comuna/1000)
+lab var regionBirth "Region where individual was born (1-15)"
 ********************************************************************************
 *** (X) Close
 ********************************************************************************
