@@ -40,3 +40,33 @@ drop _merge
 merge m:1 Comuna using "$DAT/Comunas"
 drop _merge
 
+********************************************************************************
+*** (3) Create birth comuna data
+********************************************************************************
+rename p22a whereBorn
+lab def born 1 "This comuna" 2 "Other comuna" 3 "Other country" 9 "Ignored"
+lab values whereBorn born
+
+rename Comuna censusComunaCode
+rename nombre censusComunaName
+rename p22b   Comuna
+
+merge m:1 Comuna using "$DAT/Comunas"
+
+gen birthComunaKnown = _merge==3
+replace birthComunaKnown= 2 if whereBorn== 2&_merge==1
+replace birthComunaKnown= 3 if whereBorn== 3
+replace birthComunaKnown= 9 if whereBorn== 9
+
+lab def know 1 "Known" 2 "Born other unkown comuna" 3 "Overseas" 9 "Ignored"
+lab values birthComunaKnown know
+gen birthComunaCode = Comuna if _merge==3
+drop _merge
+rename Comuna birthAllCode
+rename nombre birthComunaName
+
+********************************************************************************
+*** (4) Name other variables
+********************************************************************************
+
+*14537060
