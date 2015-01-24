@@ -156,10 +156,17 @@ lab var occupation          "Occupation of work (20 levels)"
 lab var workDetail          "Detailed occupation (80 levels)"
 lab var normalWorkPlace     "Where works normally"
 lab var normalWorkCode      "Comuna code for normal workplace"
-lab var liveBirthsy         "How many live births?"
+lab var liveBirths          "How many live births?"
 lab var survivingBirths     "Number of surviving births"
 lab var lastBirthMonth      "Time of last birth (month)"
 lab var lastBirthYear       "Time of last birth (year)"
+lab var whereBorn           "Birth comuna (here, other, etc)"
+lab var birthAllCode        "Code of where born (comuna, country, etc)"
+lab var censusComunaCode    "Comuna code of where interviewed at time of census"
+lab var censusComunaName    "Comuna name of where interviewed at time of census"
+lab var birthComunaKnown    "Is birth comuna known?"
+lab var birthComunaName     "Name of birth comuna"
+lab var birthComunaCode     "Code of birth comuna"
 
 ********************************************************************************
 *** (5) Generated variables
@@ -170,7 +177,7 @@ local level 1 2 3 4 5 5 5 5 5 5 5 6 6 6 6
 tokenize `level'
 foreach num of numlist 1(1)15 {
     dis "Code is `num', level is ``num''"
-    replace educRecode = `num' if educLevel==``num''
+    replace educRecode = ``num'' if educLevel==`num'
 }
 
 lab def educR 1 "None" 2 "Special Ed." 3 "Pre-Primary" 4 "Primary" 5 "Secondary" /*
