@@ -84,7 +84,7 @@ rename p23b normalResidenceCode
 rename p24a residence1997
 rename p24b residence1997Code
 rename p25 literate
-rename p26 educLevel
+rename p26a educLevel
 rename p27 civilStatus
 rename p28 religion
 rename p29 workLastWeek
@@ -96,7 +96,7 @@ rename p33b normalWorkCode
 rename p34 liveBirths
 rename p35 survivingBirths
 rename p36a lastBirthMonth
-rename p36ba lastBirthYear
+rename p36b lastBirthYear
 
 
 lab def sex   1 "Male" 2 "Female"
@@ -131,11 +131,35 @@ lab values workCategory cat
 lab values occupation ocp
 lab values normalWorkPlace born
 
-lab var relationHHhead "relation to household head"
-lab var gender         "Gender (1=male, 2=female)"
-lab var age            "Age in years (0-108)"
-
-
+lab var relationHHhead      "relation to household head"
+lab var gender              "Gender (1=male, 2=female)"
+lab var age                 "Age in years (0-108)"
+lab var blind               "Total blindness (binary)"
+lab var deaf                "Total Deafness (binary)"
+lab var mute                "Mute (binary)"
+lab var paralysis           "Paralysed (binary)"
+lab var mentalDeficiency    "Mental deficiency (binary)"
+lab var noPhysicalProblems  "No reported physical problems (binary)"
+lab var indigenousGroup     "Indigenous"
+lab var yearArrived         "Year arrived to Chile (from overseas)"
+lab var normalResidence     "Is this normal residence comuna?"
+lab var normalResidenceCode "Code of normal residence comuna"
+lab var residence1997       "Where residing in 1997?"
+lab var residence1997Code   "Comuna code where residing in 1997?"
+lab var literate            "Literacy"
+lab var educLevel           "Level of education (categorical)"
+lab var civilStatus         "Civil status (categorical)"
+lab var religion            "Religion"
+lab var workLastWeek        "Working last week?"
+lab var workCategory        "Category of work"
+lab var occupation          "Occupation of work (20 levels)"
+lab var workDetail          "Detailed occupation (80 levels)"
+lab var normalWorkPlace     "Where works normally"
+lab var normalWorkCode      "Comuna code for normal workplace"
+lab var liveBirthsy         "How many live births?"
+lab var survivingBirths     "Number of surviving births"
+lab var lastBirthMonth      "Time of last birth (month)"
+lab var lastBirthYear       "Time of last birth (year)"
 
 ********************************************************************************
 *** (5) Generated variables
@@ -143,18 +167,17 @@ lab var age            "Age in years (0-108)"
 gen educRecode = .
 local level 1 2 3 4 5 5 5 5 5 5 5 6 6 6 6
 
-tokenize `local'
+tokenize `level'
 foreach num of numlist 1(1)15 {
+    dis "Code is `num', level is ``num''"
     replace educRecode = `num' if educLevel==``num''
 }
 
 lab def educR 1 "None" 2 "Special Ed." 3 "Pre-Primary" 4 "Primary" 5 "Secondary" /*
 */ 6 "Tertiary"
 lab values educRecode educR
-lab var educRecode "Education (recoded 1-6) for all people 5 and over"
 
 gen educYrs=.
-
 replace educYrs=0 if educLevel==1
 replace educYrs=0.5 if educLevel==2
 replace educYrs=p26b if educLevel==3|educLevel==4
@@ -163,3 +186,12 @@ replace educYrs=12 if educRecode==5&educYrs>12
 replace educYrs=12+p26b if educRecode==6
 
 lab var educYrs "Years of Education for all people over 5 (imputed)"
+lab var educRecode "Education (recoded 1-6) for all people 5 and over"
+
+********************************************************************************
+*** (6) Save, close
+********************************************************************************
+lab dat "Chile 2002 Census, all people.  Cleaned and coded (Damian Clarke)"
+
+save "$OUT/census2002", replace
+log close
