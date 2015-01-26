@@ -6,7 +6,9 @@ nsistently, and produces an output file. This includes comuna names, names of c-
 omuna of birth, job type, and so forth.
 
 Note that all merges here are complete, and the total censal population (15,116,
-435) is accounted for.
+435) is accounted for.  Variable naming and setup is exactly as defined in IPUMS
+harmonisation.  Further details are available at:
+https://international.ipums.org/international-action/variables/group
 
 contact: mailto:damian.clarke@economics.ox.ac.uk
 
@@ -100,9 +102,9 @@ gen bplctry = Comuna if nativity!=1
 replace bplctry = 23040 if nativity==1
 
 gen yrsimm = 2002-yrimm if yrimm!=0&yrimm!=9999
-replace yrsimm==97 if yrsimm>97&yrsimm!=.
-replace yrsimm==98 if yrimm==9999
-replace yrsimm==99 if yrimm==0
+replace yrsimm=97 if yrsimm>97&yrsimm!=.
+replace yrsimm=98 if yrimm==9999
+replace yrsimm=99 if yrimm==0
 
 gen relig=p28==9
 replace relig=0 if p28==0
@@ -111,7 +113,7 @@ replace relig=5 if p28==5
 replace relig=6 if p28==1|p28==2
 replace relig=7 if p28==3|p28==7|p28==8
 
-gen indig=ethncl=<8
+gen indig=ethncl<=8
 replace indig=2 if indig==0
 
 gen lit=p25==2
@@ -194,8 +196,8 @@ gen oldreg = round(p24b/1000)
 gen mgrate5 = .
 replace mgrate5 = 0 if p24a==0
 replace mgrate5 = 11 if p24a==1
-replace mgrate5 = 12 if p24a==2&oldreg==geo1bcl
-replace mgrate5 = 20 if p24a==2&oldreg!=geo1bcl
+replace mgrate5 = 12 if p24a==2&oldreg==geo1b_cl
+replace mgrate5 = 20 if p24a==2&oldreg!=geo1b_cl
 replace mgrate5 = 30 if p24a==33
 replace mgrate5 = 99 if p24a==9
 
@@ -203,9 +205,9 @@ gen mgctry2 = p24b if p24a==3
 replace mgctry2 = 0 if mgctry==.
 
 gen migcl2 = p24b if mgrate5==11|mgrate5==12|mgrate5==20
-replace mgcl2 = 999 if mgrate==0
-replace mgcl2 = 998 if mgrate==99
-replace mgcl2 = 996 if mgrate==30
+replace migcl2 = 999 if mgrate5==0
+replace migcl2 = 998 if mgrate5==99
+replace migcl2 = 996 if mgrate5==30
 
 gen disemp = 1 if p29==9
 replace disemp = 2 if p29!=9&p29!=0
@@ -220,35 +222,40 @@ gen disable = p20_6 + 1
 #delimit ;
 lab def sex   1 "Male" 2 "Female";
 lab def rel   1 "Head" 2 "Spouse/partner" 3 "Child" 4 "Other Relative" 5
-"Non-relative";
+              "Non-relative";
 lab def civ   1 "Single/never married" 2 "Married/in union" 3
-"Separated/divorced/spouse absent" 4 "Widowed";
+              "Separated/divorced/spouse absent" 4 "Widowed";
 lab def nat   1 "Native-born" 2 "Foreign-born" 9 "Unknown";
-lab def rel   0 "not in universe" 1 "No religion" 4 "Jewish" 5 "Muslim" 6
-"Christian" 7 "Other";
+lab def rlg   0 "not in universe" 1 "No religion" 4 "Jewish" 5 "Muslim" 6
+              "Christian" 7 "Other";
 lab def ind   1 "Yes" 2 "No";
 lab def lit   0 "not in universe" 1 "No (illiterate)" 2 "Yes (literate)";
 lab def edu   0 "Not un universe" 1 "Less than primary completed" 2
-"Primary completed" 3 "Secondary completed" 4 "University completed";
+              "Primary completed" 3 "Secondary completed" 4
+              "University completed";
 lab def emp   0 "Not un universe" 1 "Employed" 2 "Unemployed" 3 "Inactive";
 lab def occ   0 "Not un universe" 1 "Legislators, senior officials and managers"
-2 "Professionals" 3 "Technicians and associate professionals" 4 "Clarks"
-5 "Service workers and shop and market sales" 6
-"Skilled agricultural and fishery workers" 7 "Crafts and related trades workers"
-8 "Plant and machine operators and assemblers" 9 "Elementary occupations"
-10 "Armed forces" 99 "NIU (not in universe)";
+              2 "Professionals" 3 "Technicians and associate professionals" 4 
+              "Clarks" 5 "Service workers and shop and market sales" 6
+              "Skilled agricultural and fishery workers" 7
+              "Crafts and related trades workers" 8
+              "Plant and machine operators and assemblers" 9
+              "Elementary occupations" 10 "Armed forces" 99
+              "NIU (not in universe)";
 lab def ind 0 "NIU (not in universe)" 10 "Agriculture, fishing, and forestry"
-20 "Mining" 30 "Manufacturing" 40 "Electricity, gas and water" 50 "Construction"
-60 "Wholesale and retail trade" 70 "Hotels and restaurants" 80
-"Transportation and communications" 90 "Financial services and insurance" 100
-"Public administration and defense" 111 "Real estate and business services" 112
-"Education" 113 "Health and social work" 114 "Other services" 120
-"Private household services" 999 "Response unkown";
+              20 "Mining" 30 "Manufacturing" 40 "Electricity, gas and water" 50
+              "Construction" 60 "Wholesale and retail trade" 70
+              "Hotels and restaurants" 80 "Transportation and communications" 90
+              "Financial services and insurance" 100
+              "Public administration and defense" 111
+              "Real estate and business services" 112 "Education" 113
+              "Health and social work" 114 "Other services" 120
+              "Private household services" 999 "Response unkown";
 lab def wrk 0 "NIU (not in universe)" 1 "Self-employed" 2 "Wage/salary worker"
-3 "Unpaid worker";
+              3 "Unpaid worker";
 lab var mig 0 "NIU (not in universe)" 11 "Same major, same minor admini unit"
-12 "Same major, different minor admin unit" 20 "Different major admin unit" 30
-"Abroad" 99 "Unknown/missing";
+              12 "Same major, different minor admin unit" 20
+              "Different major admin unit" 30 "Abroad" 99 "Unknown/missing";
 lab var dis 1 "Disabled" 2 "Not Disabled" 9 "NIU (not in universe)";
 #delimit cr
 
@@ -258,7 +265,7 @@ lab var dis 1 "Disabled" 2 "Not Disabled" 9 "NIU (not in universe)";
 lab values sex      sex
 lab values relate   rel
 lab values nativity nat
-lab values relig    rel
+lab values relig    rlg
 lab values indig    ind
 lab values lit      lit
 lab values edattan  edu
@@ -317,7 +324,8 @@ lab var dismntl     "Mental disability"
 ********************************************************************************
 *** (6) Save, close
 ********************************************************************************
-drop vn hn Portafolios p17 p27 Comuna birthComunaKnown p28 p30 p23a p23b
+drop vn hn Portafolios p17 p27 Comuna birthComunaKnown p28 p30 p23a p23b p20_* /*
+*/ p22a p23* p24* p25 p26b p28 p29 p30 p33* p36* x
 
 lab dat "Chile 2002 Census, all people.  Cleaned and coded (Damian Clarke)"
 
