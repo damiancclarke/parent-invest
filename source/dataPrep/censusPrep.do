@@ -28,8 +28,6 @@ global LOG "~/investigacion/2014/ParentalInvestments/log"
 cap mkdir $OUT
 log using "$LOG/censusPrep.txt", text replace
 
-ssc install labutil
-
 ********************************************************************************
 *** (2) Open file, merge comuna names
 ********************************************************************************
@@ -50,8 +48,8 @@ gen year = 2002
 ********************************************************************************
 *** (3) Create birth comuna data
 ********************************************************************************
-rename Comuna censusComunaCode
-rename nombre censusComunaName
+rename Comuna municl
+rename nombre municlName
 rename p22b   Comuna
 
 merge m:1 Comuna using "$DAT/Comunas"
@@ -63,7 +61,6 @@ replace birthComunaKnown= 9 if p22a == 9
 
 gen bplclComuna = Comuna if _merge==3
 drop _merge
-rename Comuna birthAllCode
 rename nombre bplclName
 
 replace bplclComuna = 96 if p22a == 3
@@ -79,29 +76,8 @@ rename p35 chsurv
 rename p19 age
 rename p18 sex
 rename p21 ethncl
+rename p22c yrimm
 
-rename p20_1 blind
-rename p20_2 deaf
-rename p20_3 mute
-rename p20_4 paralysis
-rename p20_5 mentalDeficiency
-rename p20_6 noPhysicalProblems
-rename p22c yearArrived
-rename p23a normalResidence
-rename p23b normalResidenceCode
-rename p24a residence1997
-rename p24b residence1997Code
-rename p25 literate
-rename p26a educLevel
-rename p28 religion
-rename p29 workLastWeek
-rename p30 workCategory
-rename p31 occupation
-rename p32 workDetail
-rename p33a normalWorkPlace
-rename p33b normalWorkCode
-rename p36a lastBirthMonth
-rename p36b lastBirthYear
 
 gen relate = p17==1
 replace relate = 2 if p17==2|p17==3
@@ -121,7 +97,125 @@ replace nativity=2 if p22a==3
 replace nativity=9 if p22a==9
 
 gen bplctry = Comuna if nativity!=1
-replace bblctry = 23040 if nativity==1
+replace bplctry = 23040 if nativity==1
+
+gen yrsimm = 2002-yrimm if yrimm!=0&yrimm!=9999
+replace yrsimm==97 if yrsimm>97&yrsimm!=.
+replace yrsimm==98 if yrimm==9999
+replace yrsimm==99 if yrimm==0
+
+gen relig=p28==9
+replace relig=0 if p28==0
+replace relig=4 if p28==4
+replace relig=5 if p28==5
+replace relig=6 if p28==1|p28==2
+replace relig=7 if p28==3|p28==7|p28==8
+
+gen indig=ethncl=<8
+replace indig=2 if indig==0
+
+gen lit=p25==2
+replace lit=2 if p25==1
+
+gen edattan = .
+replace edattan = 0 if p26a==0
+replace edattan = 1 if p26a==1|p26a==2
+replace edattan = 1 if p26a==4&p26b<6
+replace edattan = 1 if p26a==3&p26b<6
+replace edattan = 2 if p26a==4&p26b>=6
+replace edattan = 2 if p26a==3&p26b>=6
+replace edattan = 2 if p26a>4&p26a<=11&p26b<4
+replace edattan = 3 if p26a>4&p26a<=11&p26b>=4
+replace edattan = 3 if p26a>11&p26b<5
+replace edattan = 4 if p26a>11&p26b>=5
+
+gen yrschl = .
+replace yrschl = 0 if p26a==1|p26a==2
+replace yrschl = p26b if p26a==3|p26a==4
+replace yrschl = 8 + p26b if p26a>4&p26a<=11
+replace yrschl = 12 if yrschl>12&yrschl!=.
+replace yrschl = 12 + p26b if p26a>11
+replace yrschl = 18 if yrschl>18&yrschl!=.
+replace yrschl = 99 if p26a==0
+
+rename p26a educcl
+
+gen empstat = .
+replace empstat = 0 if p29==0
+replace empstat = 1 if p29==1|p29==2|p29==4
+replace empstat = 2 if p29==3|p29==5
+replace empstat = 3 if p29>5&p29<=10
+
+gen occisco = .
+replace occisco = 1 if p31==11|p31==12|p31==13
+replace occisco = 2 if p31>20&p31<30 
+replace occisco = 3 if p31>30&p31<40
+replace occisco = 4 if p31>40&p31<50
+replace occisco = 5 if p31==51|p31==52
+replace occisco = 6 if p31==61|p31==62
+replace occisco = 7 if p31>70&p31<80
+replace occisco = 8 if p31>80&p31<90
+replace occisco = 9 if p31>90&p31<100
+replace occisco = 10 if p31 == 1
+replace occisco = 99 if p31 == 0
+
+rename p31 occ
+
+gen indgen = .
+replace indgen = 0 if p32==0
+replace indgen = 10 if p32>0&p32<=10
+replace indgen = 20 if p32>10&p32<=20
+replace indgen = 30 if p32>20&p32<=40
+replace indgen = 40 if p32>40&p32<=45
+replace indgen = 50 if p32==45
+replace indgen = 60 if p32>50&p32<=55
+replace indgen = 70 if p32==55
+replace indgen = 80 if p32>60&p32<=65
+replace indgen = 90 if p32>64&p32<=69
+replace indgen = 100 if p32==75
+replace indgen = 111 if p32==70|p32==74
+replace indgen = 112 if p32==80
+replace indgen = 113 if p32==85
+replace indgen = 114 if p32==71|p32==72|p32==73|(p32>=90&p32<=93)
+replace indgen = 120 if p32==95
+replace indgen = 999 if p32==99
+
+rename p32 ind
+
+gen classwk = .
+replace classwk = 0 if p30==0
+replace classwk = 1 if p30==3
+replace classwk = 2 if p30==1|p30==2|p30==4
+replace classwk = 3 if p30==5
+
+gen geo1b_cl=round(municl/1000)
+
+gen oldreg = round(p24b/1000)
+gen mgrate5 = .
+replace mgrate5 = 0 if p24a==0
+replace mgrate5 = 11 if p24a==1
+replace mgrate5 = 12 if p24a==2&oldreg==geo1bcl
+replace mgrate5 = 20 if p24a==2&oldreg!=geo1bcl
+replace mgrate5 = 30 if p24a==33
+replace mgrate5 = 99 if p24a==9
+
+gen mgctry2 = p24b if p24a==3
+replace mgctry2 = 0 if mgctry==.
+
+gen migcl2 = p24b if mgrate5==11|mgrate5==12|mgrate5==20
+replace mgcl2 = 999 if mgrate==0
+replace mgcl2 = 998 if mgrate==99
+replace mgcl2 = 996 if mgrate==30
+
+gen disemp = 1 if p29==9
+replace disemp = 2 if p29!=9&p29!=0
+replace disemp = 9 if p29==0
+
+gen disblnd=(p20_1-2)*-1
+gen disdeaf=(p20_2-2)*-1
+gen dismute=(p20_3-2)*-1
+gen dismntl=(p20_4-2)*-1
+gen disable = p20_6 + 1
 
 #delimit ;
 lab def sex   1 "Male" 2 "Female";
@@ -130,117 +224,100 @@ lab def rel   1 "Head" 2 "Spouse/partner" 3 "Child" 4 "Other Relative" 5
 lab def civ   1 "Single/never married" 2 "Married/in union" 3
 "Separated/divorced/spouse absent" 4 "Widowed";
 lab def nat   1 "Native-born" 2 "Foreign-born" 9 "Unknown";
-
-
-
-
-lab def probl 1 "Blind" 2 "Deaf" 3 "Mute" 4 "Paralysis" 5 "Mental" 6 "None"
-lab def lit   0 "Under 5 years" 1 "Yes" 2 "No"
-lab def work  0 "Under 15 yrs" 1 "Working for income" 2 "Employed, didn't work"/*
-*/ 4 "Working for family, no pay" 5 "Searching work (1st time)" 6 "House work" /*
-*/ 7 "Studying" 8 "Retired/rental income" 9 "Disabled/unable to work" 10 "Other"
-lab def cat 0 "N/A (see workLastWeek)" 1 "Salary worker" 2 "Domestic services" /*
-*/  3 "Self employed" 4 "Employer" 5 "Unpaid family work"
-lab def ocp 0 "NA, or not informed" 1 "Armed forces, police" 11                /*
-*/ "Public administration/executive govt" 12 "Directors of big companies" 14   /*
-*/ "Directors, small companies" 21 "Engineer, scientist" 22 "medicine, health" /*
-*/ 23 "Teachers" 24 "Other scientist, intellectual" 31                         /*
-*/ "Technical workers, science" 32 "Technical workers, health" 33              /*
-*/ "Technical teachers" 34 "Other technical worker" 41 "Office worker" 42      /*
-*/ "Customer service" 51 "Security/protection" 52 "Salespeople, models" 61     /*
-*/ "Qualified farming, forestry, fishing" 62 "Subsistence fishers" 71          /*
-*/ "Construction/extraction" 72 "Metallurgy, contruction" 73                   /*
-*/ "Qualified machinist, graphics artist" 74 "Other officials, mechanical" 81  /*
-*/ "Operators, installation" 82 "Operators, machine" 83 "Vehicle drivers" 92   /*
-*/ "Unqualified salespeople" 92 "Workers: fishing, forestry" 93 "Workers: mining"
+lab def rel   0 "not in universe" 1 "No religion" 4 "Jewish" 5 "Muslim" 6
+"Christian" 7 "Other";
+lab def ind   1 "Yes" 2 "No";
+lab def lit   0 "not in universe" 1 "No (illiterate)" 2 "Yes (literate)";
+lab def edu   0 "Not un universe" 1 "Less than primary completed" 2
+"Primary completed" 3 "Secondary completed" 4 "University completed";
+lab def emp   0 "Not un universe" 1 "Employed" 2 "Unemployed" 3 "Inactive";
+lab def occ   0 "Not un universe" 1 "Legislators, senior officials and managers"
+2 "Professionals" 3 "Technicians and associate professionals" 4 "Clarks"
+5 "Service workers and shop and market sales" 6
+"Skilled agricultural and fishery workers" 7 "Crafts and related trades workers"
+8 "Plant and machine operators and assemblers" 9 "Elementary occupations"
+10 "Armed forces" 99 "NIU (not in universe)";
+lab def ind 0 "NIU (not in universe)" 10 "Agriculture, fishing, and forestry"
+20 "Mining" 30 "Manufacturing" 40 "Electricity, gas and water" 50 "Construction"
+60 "Wholesale and retail trade" 70 "Hotels and restaurants" 80
+"Transportation and communications" 90 "Financial services and insurance" 100
+"Public administration and defense" 111 "Real estate and business services" 112
+"Education" 113 "Health and social work" 114 "Other services" 120
+"Private household services" 999 "Response unkown";
+lab def wrk 0 "NIU (not in universe)" 1 "Self-employed" 2 "Wage/salary worker"
+3 "Unpaid worker";
+lab var mig 0 "NIU (not in universe)" 11 "Same major, same minor admini unit"
+12 "Same major, different minor admin unit" 20 "Different major admin unit" 30
+"Abroad" 99 "Unknown/missing";
+lab var dis 1 "Disabled" 2 "Not Disabled" 9 "NIU (not in universe)";
 #delimit cr
 
-lab values sex sex
-lab values relate rel
+********************************************************************************
+*** (5) Label
+********************************************************************************
+lab values sex      sex
+lab values relate   rel
 lab values nativity nat
-lab values normalResidence born
-lab values literate lit
-lab values marst civ
-lab values workLastWeek work
-lab values workCategory cat
-lab values occupation ocp
-lab values normalWorkPlace born
+lab values relig    rel
+lab values indig    ind
+lab values lit      lit
+lab values edattan  edu
+lab values empstat  emp
+lab values occisco  occ
+lab values indgen   ind
+lab values disemp   dis
+lab values disblnd  dis
+lab values disdeaf  dis
+lab values dismute  dis
+lab values dismntl  dis
+lab values disable  dis
 
-lab var serial  "Household serial number"
-lab var persons "Number of persons in household"
-lab var pernum  "Person number"
+
+lab var serial      "Household serial number"
+lab var persons     "Number of persons in household"
+lab var pernum      "Person number"
 lab var relate      "relation to household head"
-lab var sex              "Gender (1=male, 2=female)"
-lab var age                 "Age in years (0-108)"
-lab var marst         "Marital status"
-lab var consens       "Consensual union"
-lab var nativity "Nativity status"
-lab var bplctry "Country of birth"
-lab var chborn          "Children ever born"
-lab var chsurv          "Children surviving"
-lab var bplclComuna     "Code of birth comuna"
-lab var bplclName       "Name of birth comuna"
-lab var ethncl     "Ethnicity, Chile"
-
-
-lab var blind               "Total blindness (binary)"
-lab var deaf                "Total Deafness (binary)"
-lab var mute                "Mute (binary)"
-lab var paralysis           "Paralysed (binary)"
-lab var mentalDeficiency    "Mental deficiency (binary)"
-lab var noPhysicalProblems  "No reported physical problems (binary)"
-lab var yearArrived         "Year arrived to Chile (from overseas)"
-lab var normalResidence     "Is this normal residence comuna?"
-lab var normalResidenceCode "Code of normal residence comuna"
-lab var residence1997       "Where residing in 1997?"
-lab var residence1997Code   "Comuna code where residing in 1997?"
-lab var literate            "Literacy"
-lab var educLevel           "Level of education (categorical)"
-lab var religion            "Religion"
-lab var workLastWeek        "Working last week?"
-lab var workCategory        "Category of work"
-lab var occupation          "Occupation of work (20 levels)"
-lab var workDetail          "Detailed occupation (80 levels)"
-lab var normalWorkPlace     "Where works normally"
-lab var normalWorkCode      "Comuna code for normal workplace"
-lab var lastBirthMonth      "Time of last birth (month)"
-lab var lastBirthYear       "Time of last birth (year)"
-lab var birthAllCode        "Code of where born (comuna, country, etc)"
-lab var censusComunaCode    "Comuna code of where interviewed at time of census"
-lab var censusComunaName    "Comuna name of where interviewed at time of census"
-
-********************************************************************************
-*** (5) Generated variables
-********************************************************************************
-
-gen educRecode = .
-local level 1 2 3 4 5 5 5 5 5 5 5 6 6 6 6
-
-tokenize `level'
-foreach num of numlist 1(1)15 {
-    dis "Code is `num', level is ``num''"
-    replace educRecode = ``num'' if educLevel==`num'
-}
-
-lab def educR 1 "None" 2 "Special Ed." 3 "Pre-Primary" 4 "Primary" 5 "Secondary" /*
-*/ 6 "Tertiary"
-lab values educRecode educR
-
-gen educYrs=.
-replace educYrs=0 if educLevel==1
-replace educYrs=0.5 if educLevel==2
-replace educYrs=p26b if educLevel==3|educLevel==4
-replace educYrs=8+p26b if educRecode==5
-replace educYrs=12 if educRecode==5&educYrs>12
-replace educYrs=12+p26b if educRecode==6
-
-lab var educYrs "Years of Education for all people over 5 (imputed)"
-lab var educRecode "Education (recoded 1-6) for all people 5 and over"
+lab var sex         "Gender (1=male, 2=female)"
+lab var age         "Age in years (0-108)"
+lab var marst       "Marital status"
+lab var consens     "Consensual union"
+lab var nativity    "Nativity status"
+lab var bplctry     "Country of birth"
+lab var chborn      "Children ever born"
+lab var chsurv      "Children surviving"
+lab var bplclComuna "Code of birth comuna"
+lab var bplclName   "Name of birth comuna"
+lab var ethncl      "Ethnicity, Chile"
+lab var yrimm       "Year of immigration"
+lab var yrsimm      "Years since immigrated"
+lab var relig       "Religion"
+lab var indig       "Member of an indigenous group (1=yes, 2=no)"
+lab var lit         "Litearcy (1=no, 2=yes)"
+lab var edattan     "Educational attainment, international recode"
+lab var yrschl      "Years of schooling (99 is not in universe)"
+lab var educcl      "Educational attainment, Chile"
+lab var empstat     "Employment status"
+lab var occisco     "Occupation, ISCO general"
+lab var occ         "Occupation, unrecoded"
+lab var indgen      "Industry, general recode"
+lab var classwk     "Class of worker"
+lab var municl      "Municipality, Chile 1982-2002"
+lab var municlName  "Municipality, Chile 1982-2002 (name)"
+lab var geo1b_cl    "Region of CHile (1 to 15)"
+lab var mgrate      "Migration status, 5 years"
+lab var mgctry2     "Country of residence 5 years ago"
+lab var migcl2      "Comuna of residence 5 years ago"
+lab var disable     "Disability status"
+lab var disemp      "Employment disability"
+lab var disblnd     "Blind or vision-impaired"
+lab var disdeaf     "Deaf or hearing-impaired"
+lab var dismute     "Mute"
+lab var dismntl     "Mental disability"
 
 ********************************************************************************
 *** (6) Save, close
 ********************************************************************************
-drop vn hn Portafolios p17 p27 Comuna birthComunaKnown
+drop vn hn Portafolios p17 p27 Comuna birthComunaKnown p28 p30 p23a p23b
 
 lab dat "Chile 2002 Census, all people.  Cleaned and coded (Damian Clarke)"
 
