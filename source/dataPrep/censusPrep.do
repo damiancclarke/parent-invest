@@ -228,7 +228,7 @@ lab def civ   1 "Single/never married" 2 "Married/in union" 3
 lab def nat   1 "Native-born" 2 "Foreign-born" 9 "Unknown";
 lab def rlg   0 "not in universe" 1 "No religion" 4 "Jewish" 5 "Muslim" 6
               "Christian" 7 "Other";
-lab def ind   1 "Yes" 2 "No";
+lab def idg   1 "Yes" 2 "No";
 lab def lit   0 "not in universe" 1 "No (illiterate)" 2 "Yes (literate)";
 lab def edu   0 "Not un universe" 1 "Less than primary completed" 2
               "Primary completed" 3 "Secondary completed" 4
@@ -253,10 +253,10 @@ lab def ind 0 "NIU (not in universe)" 10 "Agriculture, fishing, and forestry"
               "Private household services" 999 "Response unkown";
 lab def wrk 0 "NIU (not in universe)" 1 "Self-employed" 2 "Wage/salary worker"
               3 "Unpaid worker";
-lab var mig 0 "NIU (not in universe)" 11 "Same major, same minor admini unit"
+lab def mig 0 "NIU (not in universe)" 11 "Same major, same minor admini unit"
               12 "Same major, different minor admin unit" 20
               "Different major admin unit" 30 "Abroad" 99 "Unknown/missing";
-lab var dis 1 "Disabled" 2 "Not Disabled" 9 "NIU (not in universe)";
+lab def dsb 1 "Disabled" 2 "Not Disabled" 9 "NIU (not in universe)";
 #delimit cr
 
 ********************************************************************************
@@ -266,18 +266,18 @@ lab values sex      sex
 lab values relate   rel
 lab values nativity nat
 lab values relig    rlg
-lab values indig    ind
+lab values indig    idg
 lab values lit      lit
 lab values edattan  edu
 lab values empstat  emp
 lab values occisco  occ
 lab values indgen   ind
-lab values disemp   dis
-lab values disblnd  dis
-lab values disdeaf  dis
-lab values dismute  dis
-lab values dismntl  dis
-lab values disable  dis
+lab values disemp   dsb
+lab values disblnd  dsb
+lab values disdeaf  dsb
+lab values dismute  dsb
+lab values dismntl  dsb
+lab values disable  dsb
 
 
 lab var serial      "Household serial number"
@@ -325,7 +325,7 @@ lab var dismntl     "Mental disability"
 *** (6) Save, close
 ********************************************************************************
 drop vn hn Portafolios p17 p27 Comuna birthComunaKnown p28 p30 p23a p23b p20_* /*
-*/ p22a p23* p24* p25 p26b p28 p29 p30 p33* p36* x
+*/ p22a p23* p24* p25 p26b p28 p29 p30 p33* p36* x oldreg
 
 lab dat "Chile 2002 Census, all people.  Cleaned and coded (Damian Clarke)"
 
