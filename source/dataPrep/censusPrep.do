@@ -40,6 +40,10 @@ drop _merge
 merge m:1 Comuna using "$DAT/Comunas"
 drop _merge
 
+gen x="x"
+egen serial=concat(Portafolios x vn x hn)
+bys serial: gen persons=_N
+
 ********************************************************************************
 *** (3) Create birth comuna data
 ********************************************************************************
@@ -131,6 +135,8 @@ lab values workCategory cat
 lab values occupation ocp
 lab values normalWorkPlace born
 
+lab var serial  "Household serial number"
+lab var persons "Number of persons in household"
 lab var relationHHhead      "relation to household head"
 lab var gender              "Gender (1=male, 2=female)"
 lab var age                 "Age in years (0-108)"
