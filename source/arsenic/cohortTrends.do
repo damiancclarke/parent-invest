@@ -20,8 +20,9 @@ global LOG "~/investigacion/2014/ParentalInvestments/log"
 
 log using "$LOG/arsenicTrends.txt", text replace
 
-local ant 1
-local reg 0
+local ant 0
+local reg 1
+local all 1
 
 ********************************************************************************
 *** (2) Generate variables
@@ -40,7 +41,9 @@ gen region = 1 if bregion==2
 replace region = 2 if bregion==1|bregion==3|bregion==15
 replace region = 3 if bregion>3&bregion<15
 
-
+gen group = 1 if bplclName=="antofagasta"|bplclName=="mejillones"
+replace group = 2 if bregion==1|bregion==3|bregion==15
+replace group = 3 if bregion>3&bregion<15
 
 gen active= empstat<=2
 gen employed= empstat==1
@@ -61,25 +64,50 @@ local y active employed professional technicia yrschl lessprim prim secco tercom
 *** (3) Collapse and graph
 ********************************************************************************
 if `ant'==1 {
-collapse `y', by(byear antofa)
+    preserve
+    collapse `y', by(byear antofa)
 
-foreach x of local y {
-    twoway (connect `x' byear if antofa==1)||(connect `x' byear if antofa==0), ///
-        title(`x') ytitle(`x') xtitle(Year of birth) xline(1971, lpat(dash))   ///
-        xline(1958, lpat(dot)) legend(lab(1 "Antofagasta") lab(2 "South"))     ///
-        scheme(s1mono)
-    graph export "$OUT/`x'1971.eps", as(eps) replace
-}
+    foreach x of local y {
+    #delimit ;
+        twoway (connect `x' bye if antofa==1)||(connect `x' bye if antofa==0), 
+        title(`x') ytitle(`x')  xtitle(Year of birth) xline(1971, lpat(dash))   
+        xline(1958, lpat(dot)) legend(lab(1 "Antofagasta") lab(2 "South"))     
+        scheme(s1mono);
+        graph export "$OUT/`x'AntofaSouth.eps", as(eps) replace;
+        #delimit cr
+    }
+    restore
 }
 
 if `reg'==1 {
+    preserve
     collapse `y', by(byear region)
     foreach x of varlist `y' {
-    twoway (connect `x' byear if region==1)||(connect `x' byear if region==2) ///
-         ||(connect `x' byear if region==3), title(`x') ytitle(`x')           ///
-         xtitle(Year of birth) xline(1971, lpat(dash)) xline(1958, lpat(dot)) ///
-        legend(lab(1 "Region II") lab(2 "Regions I, III, XV") lab(3 "Other")) ///
-        scheme(s1color)
-    graph export "$OUT/`x'region.eps", as(eps) replace
+        #delimit ;
+        twoway (connect `x' byear if region==1)||(connect `x' byear if region==2) 
+        ||(connect `x' byear if region==3), title(`x') ytitle(`x')           
+        xtitle(Year of birth) xline(1971, lpat(dash)) xline(1958, lpat(dot)) 
+        legend(lab(1 "Region II") lab(2 "Regions I, III, XV") lab(3 "Other"))
+        scheme(s1mono);
+        graph export "$OUT/`x'region.eps", as(eps) replace;
+        #delimit cr
     }
+    restore
+}
+
+if `all'==1 {
+    preserve
+    drop if group==.
+    collapse `y', by(byear group)
+    foreach x of varlist `y' {
+        #delimit ;
+        twoway (connect `x' byear if group==1)||(connect `x' byear if group==2) 
+        ||(connect `x' byear if group==3), title(`x') ytitle(`x')           
+        xtitle(Year of birth) xline(1971, lpat(dash)) xline(1958, lpat(dot)) 
+        legend(lab(1 "Antofagasta/Mejillones") lab(2 "Regions I, III, XV")
+        lab(3 "Regions III-XIV")) scheme(s1mono);
+        graph export "$OUT/`x'AntofaAll.eps", as(eps) replace;
+        #delimit cr
+    }
+    restore
 }
