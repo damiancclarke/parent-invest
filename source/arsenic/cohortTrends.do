@@ -21,8 +21,8 @@ global LOG "~/investigacion/2014/ParentalInvestments/log"
 log using "$LOG/arsenicTrends.txt", text replace
 
 local ant 0
-local reg 1
-local all 1
+local reg 0
+local all 0
 
 ********************************************************************************
 *** (2) Generate variables
@@ -111,3 +111,4 @@ if `all'==1 {
     }
     restore
 }
+

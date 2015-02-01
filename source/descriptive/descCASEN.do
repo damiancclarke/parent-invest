@@ -14,7 +14,7 @@ cap log close
 ********************************************************************************
 *** (1) globals locals
 ********************************************************************************
-global DAT "~/investigacion/2014/ParentalInvestments/data/labor/CASEN"
+global DAT "~/database/Casen/2003/"
 global OUT "~/investigacion/2014/ParentalInvestments/results/descriptives/CASEN"
 global LOG "~/investigacion/2014/ParentalInvestments/log"
 
@@ -24,30 +24,54 @@ log using "$LOG/descCASEN.txt", text replace
 ********************************************************************************
 *** (2) open, var generate
 ********************************************************************************
-use "$DAT/CASENarsenic"
+use "$DAT/casen2003"
 
-gen antofa = 1 if comuna==2101|comuna==2102
-replace antofa = 0 if regionBirth>4&regionBirth<15
-drop if antofa==.
+rename esc yrsEduc
+gen employed   = activ==1&(activ!=3|activ!=.)
+gen unemployed = activ==2&(activ!=3|activ!=.)
 
-gen yrBirth = surveyYr - age
-keep if yrBirth>1950&yrBirth<1980
+gen profesional = oficio == 2 if edad>=18
+gen technician  = oficio == 3 if edad>=18
+gen unqualified = oficio == 9 if edad>=18
 
+gen attendEduc = e2 == 1
+
+
+********************************************************************************
+*** (3) make graphs
+********************************************************************************
 preserve
-collapse educYrs, by(yrBirth antofa)
-sort yrBirth
+keep if edad<80
+local var yrsEduc employed unemployed profesional technician unqualif attendE
+collapse `var' [pw=expr], by(edad)
+sort edad
 
-#delimit ;
-twoway (connect educ yrB if antofa==1)||(connect educ yrB if antofa==0),
-title(Yrs Educ) ytitle(Yrs Educ)  xtitle(Year of birth) xline(1971, lpat(dash))
-xline(1958, lpat(dot)) legend(lab(1 "Antofagasta") lab(2 "South"))
-scheme(s1mono);
-graph export "$OUT/CASENyrs.eps", as(eps) replace;
-#delimit cr
-plot educYrs yrBirth if antofa==1
-plot educYrs yrBirth if antofa==0
+foreach var of varlist `var' {
+    #delimit ;
+    twoway (connect `var' edad),  title("Percent `var' by Age")
+    ytitle(`var') xtitle("Age") note("Based on CASEN 2003") scheme(s1mono);
+    graph export "$OUT/CASEN2003`var'.eps", as(eps) replace;
+    #delimit cr
+}
 restore
 
+preserve
+gen antofa = comu==2301|comu==2302
+keep if edad<80
+local var yrsEduc employed unemployed profesional technician unqualif attendE
+collapse `var' [pw=expr], by(edad antofa)
+sort edad
+
+foreach var of varlist `var' {
+    #delimit ;
+    twoway (connect `var' edad if antofa==1) || (connect `var' edad if anto==0),
+    title("Percent `var' by Age") ytitle(`var') xtitle("Age")
+    note("Based on CASEN 2003") scheme(s1mono)
+    legend(label(1 "Antofagasta/Mejillones") label(2 "Rest of Country"));
+    graph export "$OUT/CASEN2003`var'Antofagasta.eps", as(eps) replace;
+    #delimit cr
+}
+restore
 
 
 ********************************************************************************
