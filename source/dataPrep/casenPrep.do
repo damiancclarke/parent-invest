@@ -160,7 +160,7 @@ lab var household  "Household identifier (unique by year)"
 ********************************************************************************
 *** (4) Correctly code comunas to merge with mine data
 ********************************************************************************
-merge m:1 comuna surveyYr using "$COM/comunaNames"
+merge m:1 comuna surveyYr using "$COM/comunaNames9813"
 drop if _merge==1
 drop _merge
 
@@ -199,7 +199,7 @@ if `arsenic'==1 {
 ********************************************************************************
 if `copper'==1 {
     lab dat "Pooled CASEN 1998-2013 merged with Mine intensity data (2005)"
-    save "$OUT/CASENmerged", replace
+    save "$OUT/CASEN9813", replace
 }
 if `arsenic'==1 {
     lab dat "Pooled CASEN 1998-2011 merged with arsenic data (Fereccio et al.)"
