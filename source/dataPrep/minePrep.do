@@ -1,4 +1,4 @@
-/* minePrep.do v0.00                DC / SZ                yyyy-mm-dd:2014-10-19
+/* minePrep.do v1.00                DC / SZ                yyyy-mm-dd:2014-10-19
 ----|----1----|----2----|----3----|----4----|----5----|----6----|----7----|----8
 
 This file takes data output from GIS based on the distance from the midpoint of
@@ -15,6 +15,7 @@ contact: mailto:damian.clarke@economics.ox.ac.uk
 
 previous versions
 v0.00: Binary indicator interacted with ore grade and tonnage
+v1.00: Bug fix to correct order of locals for ore and grade
 
 */
 
@@ -42,11 +43,14 @@ replace mine="manzamina" if mine=="mansamina"
 
 sort mine
 destring grade, replace
-replace grade=0.711 if mine=="ujina"
-replace grade=1.001 if mine=="spence"
+
 levelsof mine, local(minenames)
-levelsof tonnage, local(tonnes)
-levelsof grade, local(grades)
+#delimit ;
+local tonnes 317 109 1120 600 200 17100 3100 1620 866 168 11800 900 4860 540
+             1230 5000 3300 1000 1030 1090 581 400 500 1298 1141;
+local grades 0.71 1.58 0.26 0.67 1 0.65 0.86 0.62 1.41 0.93 0.92 0.52 0.97 0.55
+             0.279 0.8 0.63 1.3 0.976 0.72 0.43 1 0.2 0.71 0.42;
+#delimit cr
 
 tokenize `tonnes'
 local i=1
@@ -56,7 +60,7 @@ foreach m of local minenames {
 }
 
 ********************************************************************************
-*** (3) Import comuna distances, find number of mines within 300, 400, 500, 600
+*** (3) Import comuna distances, find number of mines within 25, 50, 75, 100,200
 ********************************************************************************
 *insheet using "$DAT/ComunaMine_Distance.csv", delimit(";") names clear
 *cap drop v28
