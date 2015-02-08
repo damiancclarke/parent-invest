@@ -46,20 +46,31 @@ global COP "~/investigacion/2014/ParentalInvestments/data/Copper"
 cap mkdir "$OUT"
 log using "$LOG/casenPrep.txt", text replace
 
-local copper  = 0
-local arsenic = 1
+local setup13 = 1
+local copper  = 1
+local arsenic = 0
 
 ********************************************************************************
 *** (2) Open files, generate variables
 ********************************************************************************
-local svar e2 e3 e2 e4 e3 e3
-local swhy e3 e5 e3 e6 e5 e5
-local num  4  7  7  4  4  10
+local svar e2 e3 e2 e4 e3 e3 e3
+local swhy e3 e5 e3 e6 e5 e5 e5
+local num  4  7  7  4  4  10 10
+
+**(A) Setup 2013 for consistency in income variables
+if `setup13'==1 {
+    use "$DAT/2013/casen_2013_mn_b_principal"
+    merge 1:1 folio o using "$DAT/2013/casen_2013_ymt"
+    drop _merge
+    gen seg=1
+    save "$DAT/2013/casen_2013_mergeymt", replace
+}
 
 tokenize `svar'
-foreach y of numlist 1998(2)2000 2003(3)2009 2011 {
+foreach y of numlist 1998(2)2000 2003(3)2009 2011 2013 {
     if `y'==2009 local ap "stata"
     if `y'==2011 local ap "stata_06092012"
+    if `y'==2013 local ap "_mergeymt"
 
 
     use "$DAT/`y'/casen`y'`ap'.dta"
@@ -74,8 +85,9 @@ foreach y of numlist 1998(2)2000 2003(3)2009 2011 {
     if `y'==2009 egen folio=group(folio_2009)
     if `y'==2011 rename expr_r2 expr
     if `y'==2011 rename expc_r2 expc
-    if `y'==2011 rename rama1 rama
-    if `y'==2011 rename oficio1 oficio
+    if `y'>=2011 rename rama1 rama
+    if `y'>=2011 rename oficio1 oficio
+    if `y'==2013 rename zona z
     
     cap rename r      region
     cap rename comu   comuna
@@ -92,7 +104,7 @@ foreach y of numlist 1998(2)2000 2003(3)2009 2011 {
     rename sexo       gender
     rename edad       age
     rename yopraj     incomeJob
-    *rename ytotaj     incomeTotal
+    rename yautaj     incomeAuton
     rename ecivil     maritalStat
     rename `1'        attendSchool
     
@@ -106,7 +118,7 @@ foreach y of numlist 1998(2)2000 2003(3)2009 2011 {
     #delimit ;
     keep region comuna person WT* familySize educYrs jobArea jobType
     gender age incomeJob rural surveyYr maritalStat employed unemployed
-    inactive household segmento attendSchool hogar;
+    inactive household segmento attendSchool hogar incomeAuton;
     #delimit cr
 
     tempfile f`y'
@@ -115,7 +127,7 @@ foreach y of numlist 1998(2)2000 2003(3)2009 2011 {
 }
 
 clear
-append using `f1998' `f2000' `f2003' `f2006' `f2009' `f2011'
+append using `f1998' `f2000' `f2003' `f2006' `f2009' `f2011' `f2013'
 
 
 ********************************************************************************
@@ -136,6 +148,7 @@ lab var maritalS   "Marital Status"
 lab var attendSch  "Person currently attends school"
 lab var educYrs    "Years of education completed"
 lab var incomeJob  "Income from principal occupation"
+lab var incomeJob  "Autonomous Income (coded as per CASEN)"
 lab var hogar      "House number in household group"
 lab var rural      "Binary variable for rural (1 if rural)"
 lab var employed   "1 if active, 0 if unemployed"
@@ -185,7 +198,7 @@ if `arsenic'==1 {
 *** (X) Close
 ********************************************************************************
 if `copper'==1 {
-    lab dat "Pooled CASEN 1998-2011 merged with Mine intensity data (2005)"
+    lab dat "Pooled CASEN 1998-2013 merged with Mine intensity data (2005)"
     save "$OUT/CASENmerged", replace
 }
 if `arsenic'==1 {
