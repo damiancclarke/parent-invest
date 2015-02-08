@@ -1,7 +1,7 @@
 /* casenPrep.do v0.00            damiancclarke             yyyy-mm-dd:2014-12-11
 ----|----1----|----2----|----3----|----4----|----5----|----6----|----7----|----8
 
-This file takes raw CASEN data files from the years 2006-2011, and generates la-
+This file takes raw CASEN data files from the years 2006-2013, and generates la-
 bor variables, along with education and comuna identifiers.  This can then be m-
 erged with data on arsenic concentrations. The surveys used are 2006, 2009
 and 2011 (ie all surveys post-2003). We do not use the surveys for earlier years
@@ -39,23 +39,20 @@ global DAT "~/database/Casen"
 global OUT "~/investigacion/2014/ParentalInvestments/data/labor/CASEN"
 global LOG "~/investigacion/2014/ParentalInvestments/log"
 global COM "~/investigacion/2014/ParentalInvestments/data/Geo"
-global COP "~/investigacion/2014/ParentalInvestments/data/Copper"
 
 cap mkdir "$OUT"
 log using "$LOG/casenPrep.txt", text replace
 
-local copper  = 0
-local arsenic = 1
-
 ********************************************************************************
 *** (2) Open files, generate variables
 ********************************************************************************
-local svar e4 e3 e3
+local svar e4 e3 e3 e3
 
 tokenize `svar'
-foreach y of numlist 2006 2009 2011 {
+foreach y of numlist 2006 2009 2011 2012 {
     if `y'==2009 local ap "stata"
     if `y'==2011 local ap "stata_06092012"
+    if `y'==2011 local ap "_mergeymt"
 
 
     use "$DAT/`y'/casen`y'`ap'.dta"
@@ -74,8 +71,12 @@ foreach y of numlist 2006 2009 2011 {
     if `y'==2009 egen folio=group(folio_2009)
     if `y'==2011 rename expr_r2 expr
     if `y'==2011 rename expc_r2 expc
-    if `y'==2011 rename rama1 rama
-    if `y'==2011 rename oficio1 oficio
+    if `y'>=2011 rename rama1 rama
+    if `y'>=2011 rename oficio1 oficio
+    if `y'==2013 rename zona z
+    if `y'==2013 drop r1a
+    if `y'==2013 rename r1b r1a
+    if `y'==2013 rename r1b_c_cod r1c_cod
     
     cap rename r      region
     cap rename comu   comuna
@@ -93,6 +94,7 @@ foreach y of numlist 2006 2009 2011 {
     rename edad       age
     rename yopraj     incomeJob
     rename ytotaj     incomeTotal
+    rename yautaj     incomeAuton
     rename ecivil     maritalStat
     rename `1'        attendSchool
 
@@ -112,7 +114,7 @@ foreach y of numlist 2006 2009 2011 {
     keep region comuna person WT* familySize educYrs jobArea jobType
     gender age incomeJob rural surveyYr maritalStat employed unemployed
     inactive household segmento attendSchool hogar incomeTotal comunaBirth
-    bornForeign bornUnknown;
+    bornForeign bornUnknown incomeAuton;
     #delimit cr
 
     tempfile f`y'
@@ -121,7 +123,7 @@ foreach y of numlist 2006 2009 2011 {
 }
 
 clear
-append using `f2006' `f2009' `f2011'
+append using `f2006' `f2009' `f2011' `f2013'
 
 
 ********************************************************************************
@@ -143,6 +145,7 @@ lab var attendSch  "Person currently attends school"
 lab var educYrs    "Years of education completed"
 lab var incomeJob  "Income from principal occupation"
 lab var incomeTota "Total income for person (includes pensions, etc)"
+lab var incomeAuto "Autonomous income (coded as per CASEN)"
 lab var hogar      "House number in household group"
 lab var rural      "Binary variable for rural (1 if rural)"
 lab var employed   "1 if active, 0 if unemployed"
@@ -160,7 +163,7 @@ lab var comunaBirt "Comuna of birth of person"
 rename comuna comunaNow
 rename comunaBirth comuna
 
-merge m:1 comuna surveyYr using "$COM/comunaNames"
+merge m:1 comuna surveyYr using "$COM/comunaNames9813"
 *DROP MERGE VARIABLES FOR EARLIER YEARS (not required for these surveys)
 drop if _merge==2 
 
@@ -189,7 +192,7 @@ lab var regionBirth "Region where individual was born (1-15)"
 ********************************************************************************
 *** (X) Close
 ********************************************************************************
-lab dat "Pooled CASEN 1998-2011 merged with arsenic data (Fereccio et al.)"
+lab dat "Pooled CASEN 1998-2013 merged with arsenic data (Fereccio et al.)"
 save "$OUT/CASENarsenic", replace
 
 log close
