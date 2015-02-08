@@ -49,10 +49,10 @@ log using "$LOG/casenPrep.txt", text replace
 local svar e4 e3 e3 e3
 
 tokenize `svar'
-foreach y of numlist 2006 2009 2011 2012 {
+foreach y of numlist 2006 2009 2011 2013 {
     if `y'==2009 local ap "stata"
     if `y'==2011 local ap "stata_06092012"
-    if `y'==2011 local ap "_mergeymt"
+    if `y'==2013 local ap "_mergeymt"
 
 
     use "$DAT/`y'/casen`y'`ap'.dta"
