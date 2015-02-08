@@ -63,7 +63,7 @@ if `setup13'==1 {
     merge 1:1 folio o using "$DAT/2013/casen_2013_ymt"
     drop _merge
     gen seg=1
-    save "$DAT/2013/casen_2013_mergeymt", replace
+    save "$DAT/2013/casen2013_mergeymt", replace
 }
 
 tokenize `svar'
