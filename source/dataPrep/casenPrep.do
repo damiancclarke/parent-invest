@@ -167,6 +167,8 @@ drop _merge
 lab var cname      "Comuna Name (string)"
 lab var comnew     "Comuna code for merge to mining data"
 rename comnew id
+merge m:1 id using "$COM/oldComunas"
+drop _merge
 
 if `copper'==1 {
     merge m:1 id using "$COP/CopperTreatment"
