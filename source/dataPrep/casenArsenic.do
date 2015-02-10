@@ -187,8 +187,18 @@ lab var c7879 "Concentration of Arsenic in comuna from 1978-1979"
 lab var c8087 "Concentration of Arsenic in comuna from 1980-1987"
 lab var c8894 "Concentration of Arsenic in comuna from 1988-1994"
 
-gen regionBirth=floor(comuna/1000)
-lab var regionBirth "Region where individual was born (1-15)"
+
+********************************************************************************
+*** (5) Clean up comuna names
+********************************************************************************
+merge m:1 id using "$COM/oldComunas.dta"
+drop if _merge==2
+drop _merge
+
+lab var comunacode2000 "Birth comuna (original coding)"
+lab var regioncode2000 "Region of birth (original coding)"
+
+drop name orden comuna cname 
 ********************************************************************************
 *** (X) Close
 ********************************************************************************
