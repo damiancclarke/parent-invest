@@ -25,6 +25,7 @@ cap log close
 global DAT "~/database/Censo/CENSO_2002/CENSO2002"
 global OUT "~/investigacion/2014/ParentalInvestments/data/census"
 global LOG "~/investigacion/2014/ParentalInvestments/log"
+global GEO "~/investigacion/2014/ParentalInvestments/data/Geo"
 
 
 cap mkdir $OUT
@@ -73,6 +74,9 @@ replace bplclComuna = 97 if bplclComuna == .
 *** (4) Name other variables
 ********************************************************************************
 rename pn pernum
+keep serial p26a p26b pernum
+save $OUT/raweduc.dta, replace
+exit
 rename p34 chborn
 rename p35 chsurv
 rename p19 age
@@ -320,6 +324,19 @@ lab var disblnd     "Blind or vision-impaired"
 lab var disdeaf     "Deaf or hearing-impaired"
 lab var dismute     "Mute"
 lab var dismntl     "Mental disability"
+
+
+********************************************************************************
+*** (6) Merge into old comuna names
+********************************************************************************
+replace bplclComuna = 5802 if bplclComuna == 5505
+replace bplclComuna = 5803 if bplclComuna == 5507
+replace bplclComuna = 5801 if bplclComuna == 5106
+replace bplclComuna = 5804 if bplclComuna == 5108
+
+gen id=bplclComuna
+merge m:1 id using "../Geo/oldComunas"
+drop _merge
 
 ********************************************************************************
 *** (6) Save, close
