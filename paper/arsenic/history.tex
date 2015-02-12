@@ -1,0 +1,86 @@
+\documentclass{article}[12pt,subeqn]
+
+%================================================================================
+%PACKAGES
+%================================================================================
+\usepackage{amsmath}
+%\usepackage{appendix}
+\usepackage{array}
+\usepackage{booktabs}
+%\usepackage{cleveref}
+\usepackage[usenames, dvipsnames]{color} 
+\usepackage{framed}
+\usepackage[capposition=top]{floatrow}
+\usepackage[pdftex]{graphicx}
+\usepackage[update,prepend]{epstopdf}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+%\usepackage{lineno}
+\usepackage{lscape}
+\usepackage{natbib}
+\usepackage{rotating,capt-of}
+\usepackage{setspace}
+\usepackage{siunitx}
+\usepackage{subfloat}
+
+\bibliographystyle{abbrvnat}
+\bibpunct{(}{)}{;}{a}{,}{,}
+
+
+%================================================================================
+%TITLE
+%================================================================================
+
+
+%================================================================================
+%MARGINS
+%================================================================================
+\setlength\topmargin{-0.375in}
+\setlength\textheight{8.8in}
+\setlength\textwidth{5.8in}
+\setlength\oddsidemargin{0.4in}
+\setlength\evensidemargin{-0.5in}
+\setlength\parindent{0.25in}
+\setlength\parskip{0.25in}
+
+
+%================================================================================
+%NEW COMMANDS
+%================================================================================
+\newcommand{\Lagr}{\mathcal{L}}
+\newcommand{\vect}[1]{\mathbf{#1}}
+\newcolumntype{P}[1]{>{\raggedright}p{#1\linewidth}}
+
+\hypersetup{                                                                                                    
+    colorlinks=true,   
+    linkcolor=BlueViolet,
+    citecolor=BlueViolet,
+    filecolor=BlueViolet,
+    urlcolor=BlueViolet
+}  
+
+
+
+\begin{document}
+\begin{spacing}{1.4}
+\section{Arsenic Exposure in the North of Chile: History}
+Arsenic is present naturally in the earth's crust, and is principally
+produced naturally due to volcanic activity.  Arsenic is widely found
+in natural ground water, although concentrations are generally low:
+typically below \SI{10}{\micro\gram}/L, or 10
+parts per billion \citep{WHO2001}.  However, in some circumstances,
+particulalry in volcanic regions, geological water sources contain
+much higher concentrations of the metalloid.\footnote{Elemental arsenic
+(As) is not soluble in water.  Soluble arsenic in drinking water is
+typicall found as arsenate salts, a form of anionic arsenic.}
+
+Such is the case for the north of Chile, where 
+
+
+
+
+\newpage
+\bibliography{./refs}
+
+\end{spacing}
+\end{document}
