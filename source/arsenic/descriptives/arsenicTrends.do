@@ -72,8 +72,10 @@ merge 1:1 comuna_id using "$MAP/comuna_data"
 drop if _merge==2
 drop _merge
 
-*spmap arsenic using "$MAP/comuna_coords", fcolor(Greens) id(ID)
-*graph export "$OUT/ArsenicMap.eps", as(eps) replace
+spmap arsenic using "$MAP/comuna_coords" if ID!=346&ID!=336, fcolor(Greens) /*
+*/ id(ID) osize(vvthin) clmethod(custom) clbreaks(0 150 300 450 600) legorder(lohi)
+graph export "$OUT/ArsenicMap.eps", as(eps) replace
 
-spmap difAs using "$MAP/comuna_coords", fcolor(Greens) id(ID)
+spmap difAs using "$MAP/comuna_coords" if ID!=346&ID!=336, fcolor(Greens) /*
+*/ id(ID) osize(vvthin) clmethod(custom) clbreaks(0 150 300 450 600) legorder(lohi)
 graph export "$OUT/ArsenicChange.eps", as(eps) replace
