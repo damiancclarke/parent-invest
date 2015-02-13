@@ -40,6 +40,7 @@ lab define areas 0 "Rest of Chile" 1 "Antofagasta/Mejillones" 2 "Calama" 3 /*
 */ "San Pedro" 4 "Rest of I-IV region"
 lab values area areas
 
+preserve
 collapse arsenic, by(area year)
 
 sort area year
@@ -52,7 +53,27 @@ twoway line arsenic year if area==1 || line arsenic year if area==2, lpat(dash) 
 */ note("Arsenic concentrations collected by authors based on tap water readings.")
 
 graph export "$OUT/arsenicConcentrations.eps", as(eps) replace
+restore
 
 ********************************************************************************
 *** (3) Map Arsenic Concentrations (average)
 ********************************************************************************
+rename codigo_ine id
+bys id: egen maxAs=max(arsenic)
+bys id: egen minAs=min(arsenic)
+gen difAs = maxAs-minAs
+
+collapse arsenic difAs, by(id)
+
+merge 1:m id using "$AS/mapComuna"
+drop if _merge!=3
+drop _merge
+merge 1:1 comuna_id using "$MAP/comuna_data"
+drop if _merge==2
+drop _merge
+
+*spmap arsenic using "$MAP/comuna_coords", fcolor(Greens) id(ID)
+*graph export "$OUT/ArsenicMap.eps", as(eps) replace
+
+spmap difAs using "$MAP/comuna_coords", fcolor(Greens) id(ID)
+graph export "$OUT/ArsenicChange.eps", as(eps) replace
