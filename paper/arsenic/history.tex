@@ -22,6 +22,8 @@
 \usepackage{setspace}
 \usepackage{siunitx}
 \usepackage{subfloat}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \bibliographystyle{abbrvnat}
 \bibpunct{(}{)}{;}{a}{,}{,}
@@ -65,19 +67,110 @@
 \begin{spacing}{1.4}
 \section{Arsenic Exposure in the North of Chile: History}
 Arsenic is present naturally in the earth's crust, and is principally
-produced naturally due to volcanic activity.  Arsenic is widely found
-in natural ground water, although concentrations are generally low:
-typically below \SI{10}{\micro\gram}/L, or 10
-parts per billion \citep{WHO2001}.  However, in some circumstances,
-particulalry in volcanic regions, geological water sources contain
-much higher concentrations of the metalloid.\footnote{Elemental arsenic
-(As) is not soluble in water.  Soluble arsenic in drinking water is
-typicall found as arsenate salts, a form of anionic arsenic.}
+produced by volcanic activity.  Arsenic is widely found in natural
+ground water, although concentrations are generally low: typically
+below \SI{10}{\micro\gram}/L, or 10 parts per billion \citep{WHO2001}.
+However, in some circumstances, particularly in volcanic regions,
+geological water sources contain much higher concentrations of the
+metalloid.\footnote{Elemental arsenic (As) is not soluble in water.
+Soluble arsenic in drinking water is typicall found as arsenate salts,
+a form of anionic arsenic.} 
 
-Such is the case for the north of Chile, where 
+\subsection{Arsenic in Drinking Water in Antofagasta}
+Such is the case for the north of Chile, a zone spanned by the Atacama
+desert, where all drinking water consumed is drawn from ground
+water. Geographically, Chile is split into 15 regions (similar to   
+States in the USA), numbered from I to XV.  The five northernmost
+regions (XV, I, II, III, and IV), house 2,244,666 people, or 12.6\% of
+Chile's population of 17,819,054 \citep{INE2014}.  The Atacama desert,
+which contains these five regions, is the driest desert in the world,
+receiving approximately 15 mm of rainfall per year.  Historically,
+extremeley low rainfall and a growing population has meant that a
+number of important changes in water sources occurred.
+
+Drawing water from alternative sources has meant that the
+concentration of arsenic in drinking water has fluctuated
+substantially historically.  This is particularly the case for
+Antofagasta (the fifth-largest city in Chile) and its surrounds.
+From its foundation in 1860, Antofagasta obtained drinking water by
+distilling sea water.  With the growth of the population, the
+water sources were expanded to include the Siloli river, whose arsenic
+concentration varies from 90 to \SI{100}{\micro\gram}/L, and this
+source was used until the late 1950s \citep{FerreccioSancha2006}. 
+
+
+With further population growth, the city attempted to secure a more
+abundant source of water by constructing a series of pipes to
+transport water 300 km from the Toconce river.  The first water
+arrived from the Toconce river in August of 1958
+\citep{MainoRecabarren2012,FerreccioSancha2006}. However,
+concentrations of Arsenic in the Toconce river were extremely high:
+ranging from 800 to \SI{900}{\micro\gram}/L.  Hence, between 1958 and
+1959, the concentrations consumed by individuals in the town jumped
+nearly 10 fold (to 17 times the WHO recommendation), with the majority
+of water consumed by inhabitants drawn from the new source
+\citep{Fraser2012}. 
+
+Extremely high concentrations continued to be consumed from the end of
+1958 until 1971.  In 1971, due to growing realisations of the harm
+caused by arsenic in drinking water, along with campaigns in regional
+newspapers, the first arsenic removal plant was put in operation in
+Arsenic.  This plant reduced the concentrations of arsenic in drinking
+water to approximately \SI{110}{\micro\gram}/L, lower than the newly
+implemented law requiring concentrations below \SI{120}{\micro\gram}/L
+in drinking water.  The solid line in figure \ref{ASfig:arsenic} plots
+the concentration of arsenic in drinking water in Antofagasta and its
+surrounds between 1930 and 2002, with the important spike
+corresponding to the use of Toconce river water between 1958 and 1971.
+
+\begin{figure}[htpb]
+\includegraphics{./arsenicConcentrations.eps}
+\caption{Historical Concentrations of Arsenic in Tap Water (\SI{}{\micro\gram}/L)}
+\label{ASfig:arsenic}
+\end{figure}
+
+\subsection{Arsenic Concentrations in Other Cities}
+With population growth in other areas of the northern regions of
+Chile, an additional arsenic removal plant was constructed in 1978
+\citep{MainoRecabarren2012}. This plant, treating water for the cities
+of Calama and Tocopilla, reduced arsenic concentration in these cities
+(see dashed line in figure \ref{ASfig:arsenic}).  A third and final
+plant was constructed in Antofagasta in 1989 to increase the capacity
+for arsenic removal in the city.
+
+Technological improvements in arsenic removal technologies along with
+an increasing awareness of the damage caused by arsenic consumption,
+resulted in the modification of the Chilean Law for Drinking Water in
+1984.  The old requirement that arsenic concentrations must be no
+greater than 120 ppb was reduced to a maximum level of 50
+ppb. Finally, in 2005 the law was modified again, to comply with the
+international WHO requirement that arsenic concetrations do not exceed
+10 ppb \citep{WHO2001}.
 
 
 
+
+\newpage
+\begin{figure}
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[scale=0.4,width=.4\linewidth]{ArsenicMap.pdf}
+  \caption{Arsenic Average Concentrations: 1930-2002}
+  \label{fig:sub1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[scale=0.4,width=.4\linewidth]{ArsenicChange.pdf}
+  \caption{Change in Arsenic Concentrations (Max-Min)}
+  \label{fig:sub2}
+\end{subfigure}
+\caption{Arsenic in Chile}
+\label{fig:test}
+\end{figure}
+
+
+\clearpage
 
 \newpage
 \bibliography{./refs}
