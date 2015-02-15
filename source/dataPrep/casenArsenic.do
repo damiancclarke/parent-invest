@@ -99,7 +99,6 @@ foreach y of numlist 2006 2009 2011 2013 {
     rename ytotaj     incomeTotal
     rename yautaj     incomeAuton
     rename ecivil     maritalStat
-    rename o10        hoursWorked
     rename `1'        attendSchool
 
     gen comunaBirth=comuna if r1a==1
@@ -160,7 +159,7 @@ lab var household  "Household identifier (unique by year)"
 lab var bornForeig "1 if person reports born in a foreign country"
 lab var bornUnknow "1 if person doesn't know comuna of birth or only reports reg"
 lab var comunaBirt "Comuna of birth of person"
-lab var hoursWork  "Hours worked in main job
+lab var hoursWork  "Hours worked in main job"
 
 ********************************************************************************
 *** (4) Correctly code comunas to merge with mine data
