@@ -62,17 +62,20 @@ foreach y of numlist 2006 2009 2011 2013 {
     local ncom : word count `r(levels)'
     dis "In `y' there are `obs' observations in `ncom' comunas."
 
+    if `y'==2006 rename o15 hoursWorked
     if `y'==2006 rename t7 r1a
     if `y'==2006 rename c_t7e r1c_cod
     if `y'==2009 rename t8 r1a
     if `y'==2009 destring t8cod, replace    
     if `y'==2009 rename t8cod r1c_cod    
     if `y'==2009 rename o_2009 o
+    if `y'==2009 rename o16 hoursWorked
     if `y'==2009 egen folio=group(folio_2009)
     if `y'==2011 rename expr_r2 expr
     if `y'==2011 rename expc_r2 expc
     if `y'>=2011 rename rama1 rama
     if `y'>=2011 rename oficio1 oficio
+    if `y'>=2011 rename o10 hoursWorked
     if `y'==2013 rename zona z
     if `y'==2013 drop r1a
     if `y'==2013 rename r1b r1a
@@ -96,6 +99,7 @@ foreach y of numlist 2006 2009 2011 2013 {
     rename ytotaj     incomeTotal
     rename yautaj     incomeAuton
     rename ecivil     maritalStat
+    rename o10        hoursWorked
     rename `1'        attendSchool
 
     gen comunaBirth=comuna if r1a==1
@@ -114,7 +118,7 @@ foreach y of numlist 2006 2009 2011 2013 {
     keep region comuna person WT* familySize educYrs jobArea jobType
     gender age incomeJob rural surveyYr maritalStat employed unemployed
     inactive household segmento attendSchool hogar incomeTotal comunaBirth
-    bornForeign bornUnknown incomeAuton;
+    bornForeign bornUnknown incomeAuton hoursWorked;
     #delimit cr
 
     tempfile f`y'
@@ -156,6 +160,7 @@ lab var household  "Household identifier (unique by year)"
 lab var bornForeig "1 if person reports born in a foreign country"
 lab var bornUnknow "1 if person doesn't know comuna of birth or only reports reg"
 lab var comunaBirt "Comuna of birth of person"
+lab var hoursWork  "Hours worked in main job
 
 ********************************************************************************
 *** (4) Correctly code comunas to merge with mine data
