@@ -19,10 +19,12 @@ global AS  "~/investigacion/2014/ParentalInvestments/data/arsenic"
 global MAP "~/database/ChileRegiones/GeoRefs/division_comunal"
 global OUT "~/investigacion/2014/ParentalInvestments/results/arsenic/descriptives"
 global LOG "~/investigacion/2014/ParentalInvestments/log"
+global MIN "~/investigacion/2014/ParentalInvestments/data/Copper"
 
 log using "$LOG/arsenicTrends.txt", text replace
 
-
+local maps 0
+local prdn 0
 ********************************************************************************
 *** (2) Import, make concentration graph
 ********************************************************************************
@@ -40,6 +42,7 @@ lab define areas 0 "Rest of Chile" 1 "Antofagasta/Mejillones" 2 "Calama" 3 /*
 */ "San Pedro" 4 "Rest of I-IV region"
 lab values area areas
 
+if `prdn'==1 {
 preserve
 collapse arsenic, by(area year)
 
@@ -54,11 +57,13 @@ twoway line arsenic year if area==1 || line arsenic year if area==2, lpat(dash) 
 
 graph export "$OUT/arsenicConcentrations.eps", as(eps) replace
 restore
+}
 
 ********************************************************************************
 *** (3) Map Arsenic Concentrations (average)
 ********************************************************************************
-rename codigo_ine id
+if `maps'==1 {
+    rename codigo_ine id
 bys id: egen maxAs=max(arsenic)
 bys id: egen minAs=min(arsenic)
 gen difAs = maxAs-minAs
@@ -72,15 +77,39 @@ merge 1:1 comuna_id using "$MAP/comuna_data"
 drop if _merge==2
 drop _merge
 
-spmap arsenic using "$MAP/comuna_coords" if ID!=346&ID!=336, fcolor(Greens) /*
-*/ id(ID) osize(vvthin) clmethod(custom) clbreaks(0 20 100 400 700) /*
-*/ legorder(lohi) legend(symy(*2) symx(*2) size(*2.6) position (10))
-graph export "$OUT/ArsenicMap.eps", as(eps) replace
+*spmap arsenic using "$MAP/comuna_coords" if ID!=346&ID!=336, fcolor(Greens) /*
+**/ id(ID) osize(vvthin) clmethod(custom) clbreaks(0 20 100 400 700) /*
+**/ legorder(lohi) legend(symy(*2) symx(*2) size(*2.6) position (10))
+*graph export "$OUT/ArsenicMap.eps", as(eps) replace
 
+    
 spmap difAs using "$MAP/comuna_coords" if ID!=346&ID!=336, fcolor(Greens) /*
-*/ id(ID) osize(vvthin) clmethod(custom) clbreaks(0 20 100 400 700) /*
+*/ id(ID) osize(vvthin) clmethod(custom) clbreaks(0 20 100 400 830) /*
 */ legorder(lohi) legend(symy(*2) symx(*2) size(*2.6) position (10))
 graph export "$OUT/ArsenicChange.eps", as(eps) replace
 
+}
+
+********************************************************************************
+*** (4) Potential confounders (mines)
+********************************************************************************
+insheet using "$MIN/minesAntofa.csv", clear delim(";") names
+rename v1 mine
+reshape long v, i(mine) j(year)
+replace year=year+1958
+rename v copper
+replace copper=subinstr(copper, ",", ".", 1)
+destring copper, replace
+
+local dist "304km, 245km and 35km"
+#delimit ;
+twoway line copper year if mine=="Salvador", lpat(dash)      ||
+       line copper year if mine=="Chuqui",   lpat(longdash)  ||
+       line copper year if mine=="Mantos Blancos", scheme(s1mono)
+legend(label(1 "El Salvador") label(2 "Chuqui") label(3 "Mantos Blancos"))
+ytitle("Copper Production (Tonnes)") xtitle("Year")
+note("Each mine is in the II region, at a distance of `dist' from Antofagasta");
+#delimit cr
+graph export $OUT/ConfoundingMines.eps, as(eps) replace
 
 log close
