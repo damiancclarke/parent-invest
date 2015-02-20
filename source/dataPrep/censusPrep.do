@@ -338,8 +338,17 @@ gen id=bplclComuna
 merge m:1 id using "../Geo/oldComunas"
 drop _merge
 
+
 ********************************************************************************
-*** (6) Save, close
+*** (7) Add household characteristisc
+********************************************************************************
+rename (vn hn) (VN HN)
+merge m:1 Portafolio VN HN using "$DAT/Hogares"
+
+exit
+
+********************************************************************************
+*** (8) Save, close
 ********************************************************************************
 drop vn hn Portafolios p17 p27 Comuna birthComunaKnown p28 p30 p23a p23b p20_* /*
 */ p22a p23* p24* p25 p26b p28 p29 p30 p33* p36* x oldreg
