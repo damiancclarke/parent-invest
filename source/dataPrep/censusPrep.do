@@ -74,9 +74,9 @@ replace bplclComuna = 97 if bplclComuna == .
 *** (4) Name other variables
 ********************************************************************************
 rename pn pernum
-keep serial p26a p26b pernum
-save $OUT/raweduc.dta, replace
-exit
+*keep serial p26a p26b pernum
+*save $OUT/raweduc.dta, replace
+*exit
 rename p34 chborn
 rename p35 chsurv
 rename p19 age
