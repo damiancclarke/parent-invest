@@ -335,7 +335,7 @@ replace bplclComuna = 5801 if bplclComuna == 5106
 replace bplclComuna = 5804 if bplclComuna == 5108
 
 gen id=bplclComuna
-merge m:1 id using "../Geo/oldComunas"
+merge m:1 id using "$GEO/oldComunas"
 drop _merge
 
 
@@ -346,6 +346,44 @@ rename (vn hn) (VN HN)
 merge m:1 Portafolio VN HN using "$DAT/Hogares"
 
 exit
+gen television   =
+gen videocamera  =
+gen cableTV      =
+gen computer     =
+gen washMachine  =
+gen clothesDrier =
+gen refrigerator =
+gen freezer      =
+gen microwave    =
+gen internet     =
+gen bicycle      =
+gen motorbike    =
+gen van          =
+gen car          =
+gen truck        =
+gen boat         =
+
+rename puntaje   goodsPoints
+rename CSE_Decil goodsDecile
+
+lab var television   "Television in individual's household"
+lab var videocamera  "Videocamera in individual's household" 
+lab var cableTV      "Cable TV in individual's household" 
+lab var computer     "Computer in individual's household" 
+lab var washMachine  "Washing machine in individual's household" 
+lab var clothesDrier "Clothes Dryer in individual's household" 
+lab var refrigerator "Refrigerator in individual's household"
+lab var freezer      "Freezer in individual's household"
+lab var microwave    "Microwave in individual's household"
+lab var internet     "Internet in individual's household"
+lab var bicycle      "Bicycle accessible by individual"
+lab var motorbike    "Motorbile accessible by individual"
+lab var van          "Van (automobile) accessible by individual"
+lab var car          "Car accessible by individual"
+lab var truck        "Truck/jeep accessible by individual"
+lab var boat         "Boat accessible by individual"
+lab var goodsPoints  "Points assigned to individual based on goods in home"
+lab var goodsDecile  "Decile assigned to individual based on goods in home"
 
 ********************************************************************************
 *** (8) Save, close
