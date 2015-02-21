@@ -335,7 +335,7 @@ replace bplclComuna = 5801 if bplclComuna == 5106
 replace bplclComuna = 5804 if bplclComuna == 5108
 
 gen id=bplclComuna
-merge m:1 id using "$GEO/oldComunas"
+merge m:1 id using "$GEO/oldComunas", fast
 drop _merge
 
 
@@ -345,7 +345,8 @@ drop _merge
 rename vn VN
 rename hn HN
 rename Portafolios Portafolio
-merge m:1 Portafolio VN HN using "$DAT/Hogares"
+merge m:1 Portafolio VN HN using "$DAT/Hogares", fast
+drop _merge
 
 gen television   = H15_1==1|H15_2==1 if H15_1!=0
 gen videocamera  = H15_3==1 if H15_3!=0
