@@ -342,28 +342,28 @@ drop _merge
 ********************************************************************************
 *** (7) Add household characteristisc
 ********************************************************************************
-rename (vn hn) (VN HN)
+rename vn VN
+rename hn HN
+rename Portafolios Portafolio
 merge m:1 Portafolio VN HN using "$DAT/Hogares"
 
-exit
-gen television   =
-gen videocamera  =
-gen cableTV      =
-gen computer     =
-gen washMachine  =
-gen clothesDrier =
-gen refrigerator =
-gen freezer      =
-gen microwave    =
-gen internet     =
-gen bicycle      =
-gen motorbike    =
-gen van          =
-gen car          =
-gen truck        =
-gen boat         =
+gen television   = H15_1==1|H15_2==1 if H15_1!=0
+gen videocamera  = H15_3==1 if H15_3!=0
+gen cableTV      = H15_4==1 if H15_4!=0
+gen computer     = H15_15==1 if H15_15!=0
+gen washMachine  = H15_6==1 if H15_6!=0
+gen clothesDrier = H15_7==1 if H15_7!=0
+gen refrigerator = H15_8==1 if H15_8!=0
+gen freezer      = H15_9==1 if H15_9!=0
+gen microwave    = H15_10==1 if H15_10!=0
+gen internet     = H15_11==1 if H15_11!=0
+gen bicycle      = H16_1==1 if H16_1!=0
+gen motorbike    = H16_2==1 if H16_2!=0
+gen van          = H16_3==1 if H16_3!=0
+gen car          = H16_4==1 if H16_4!=0
+gen truck        = H16_5==1 if H16_5!=0
+gen boat         = H16_6==1 if H16_6!=0
 
-rename puntaje   goodsPoints
 rename CSE_Decil goodsDecile
 
 lab var television   "Television in individual's household"
@@ -382,14 +382,13 @@ lab var van          "Van (automobile) accessible by individual"
 lab var car          "Car accessible by individual"
 lab var truck        "Truck/jeep accessible by individual"
 lab var boat         "Boat accessible by individual"
-lab var goodsPoints  "Points assigned to individual based on goods in home"
 lab var goodsDecile  "Decile assigned to individual based on goods in home"
 
 ********************************************************************************
 *** (8) Save, close
 ********************************************************************************
-drop vn hn Portafolios p17 p27 Comuna birthComunaKnown p28 p30 p23a p23b p20_* /*
-*/ p22a p23* p24* p25 p26b p28 p29 p30 p33* p36* x oldreg
+drop VN HN Portafolio p17 p27 Comuna birthComunaKnown p28 p30 p23a p23b p20_* /*
+*/ p22a p23* p24* p25 p26b p28 p29 p30 p33* p36* x oldreg H1* TH TM TP
 
 lab dat "Chile 2002 Census, all people.  Cleaned and coded (Damian Clarke)"
 
