@@ -388,7 +388,7 @@ if `house'==1 {
     gen truck        = H16_5==1 if H16_5!=0
     gen boat         = H16_6==1 if H16_6!=0
 
-    rename CSE_Decil goodsDecile
+    rename CSE_DECI goodsDecile
 
     lab var television   "Television in individual's household"
     lab var videocamera  "Videocamera in individual's household" 
@@ -408,7 +408,7 @@ if `house'==1 {
     lab var boat         "Boat accessible by individual"
     lab var goodsDecile  "Decile assigned to individual based on goods in home"
 
-    drop H1*
+    drop H1* TH TM TP
     lab dat "Chile 2002 Census, household goods.  Cleaned and coded (D. Clarke)"
     save "$OUT/census2002_goods"
 }
