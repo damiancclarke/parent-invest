@@ -375,6 +375,7 @@ if `house'==1 {
     replace V1=8 if V1>8
     rename V1 houseType
     rename V3 ownership
+    drop VN
     rename VN_Renumerado VN
 
     
