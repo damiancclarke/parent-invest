@@ -347,6 +347,8 @@ if `indiv'==1 {
 
     lab dat "Chile 2002 Census, all people.  Cleaned and coded (Damian Clarke)"
     save "$OUT/census2002", replace
+    *keep if region2000<=4
+    *save "$OUT/census2002_r1_4", replace
 }
 
 ********************************************************************************
@@ -365,9 +367,25 @@ if `house'==1 {
     drop _merge
 
     
-    rename vn VN
+    rename vn VN_Renumerado
     rename hn HN
     rename Portafolios Portafolio
+    merge m:1 Portafolio VN_R using "$DAT/Viviendas"
+    drop V2 V4* V5 V6 V7 V8 V9 V10A V11 _merge
+    replace V1=8 if V1>8
+    rename V1 houseType
+    rename V3 ownership
+    rename VN_Renumerado VN
+
+    
+    lab def house 1 "House" 2 "Apartment" 3 "Rooms in house" 4 "mediagua" /*
+    */5 "rancho/chuza" 6 "ruca" 7 "Mobile home" 8 "Other" 
+    lab def owner 0 "N/A" 1 "Owner (paid off)" 2 "Owner (paying)" 3 "Renter" /*
+    */ 4 "Given for work/service" 5 "Free"
+    lab values houseType house
+    lab values ownership owner
+    
+    
     merge m:1 Portafolio VN HN using "$DAT/Hogares"
     drop _merge
 
@@ -411,6 +429,19 @@ if `house'==1 {
     drop H1* TH TM TP
     lab dat "Chile 2002 Census, household goods.  Cleaned and coded (D. Clarke)"
     save "$OUT/census2002_goods"
+
+    ****************************************************************************
+    *** (9) Subset
+    ****************************************************************************
+    keep if regioncode2000<=4
+    gen x="x"
+    egen serial=concat(Portafolios x vn x hn)
+    bys serial: gen persons=_N
+    rename PN pernum
+    drop x
+    merge 1:1 serial pernum using "$OUT/census2002_r1_4"
+
+    save "$OUT/census2002_goods_r1_4", replace
 }
 
 
