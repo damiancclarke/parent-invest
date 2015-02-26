@@ -437,12 +437,12 @@ if `house'==1 {
     ****************************************************************************
     keep if regioncode2000<=4
     gen x="x"
-    egen serial=concat(Portafolios x vn x hn)
-    bys serial: gen persons=_N
-    rename PN pernum
+    egen serial=concat(Portafolio x VN x HN)
+    rename pn pernum
     drop x
-    merge 1:1 serial pernum using "$OUT/census2002_r1_4"
-
+    merge 1:1 serial pernum using "$OUT/census2002_north"
+    drop _merge
+    
     save "$OUT/census2002_goods_r1_4", replace
 }
 
