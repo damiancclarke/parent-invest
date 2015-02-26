@@ -371,6 +371,7 @@ if `house'==1 {
     rename hn HN
     rename Portafolios Portafolio
     merge m:1 Portafolio VN_R using "$DAT/Viviendas"
+    drop if _merge==2
     drop V2 V4* V5 V6 V7 V8 V9 V10A V11 _merge
     replace V1=8 if V1>8
     rename V1 houseType
@@ -429,7 +430,7 @@ if `house'==1 {
 
     drop H1* TH TM TP
     lab dat "Chile 2002 Census, household goods.  Cleaned and coded (D. Clarke)"
-    save "$OUT/census2002_goods"
+    save "$OUT/census2002_goods", replace
 
     ****************************************************************************
     *** (9) Subset
