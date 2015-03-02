@@ -27,8 +27,8 @@ merge m:1 oldnumber using "$DAT/censusNames1970", gen(_merge70)
 gen birthComuna = newnumber if oldnumber<650&oldnumber!=1
 gen birthCode = .
 replace birthCode = 1 if birthComuna!=.
-replace birthCode = 2 if oldnumber>650&oldnumber!=.
-replace birthCode = 3 if oldnumber==650
+replace birthCode = 3 if oldnumber>650&oldnumber!=.
+replace birthCode = 2 if oldnumber==650
 
 drop oldnumber newnumber
 gen  oldnumber = cl70a_muni5yr
@@ -59,7 +59,7 @@ merge m:1 comunacode2010 using "$DAT/oldComunas"
 drop if _merge==2
 drop _merge
 
-lab def codes 1 "Know birth comuna" 2 "Unknown/unreported" 3 "Foreigh country"
+lab def codes 1 "Know birth comuna" 2 "Unknown/unreported" 3 "Foreign country"
 lab val birthCode codes
 
 ********************************************************************************
