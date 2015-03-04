@@ -84,8 +84,6 @@ local out $OUT/regression/EventStudy.xls
 
 cap rm "`out'"
 cap rm "$OUT/regression/EventStudy.txt"
-gen time = _n-6 in 1/10
-replace time = time+1 in 5/10
 
 
 ********************************************************************************
@@ -93,10 +91,12 @@ replace time = time+1 in 5/10
 ********************************************************************************
 preserve
 keep if negSamp==1
+gen time = _n-6 in 1/10
+replace time = time+1 in 5/10
 
 foreach y of varlist `yvars' {
-    areg `y' negTreat `FE' `trend', ab(comunacode2000) `se'
-    outreg2 negTreat using "`out'", par excel lab bdec(3) se bracket nocons
+    *areg `y' negTreat `FE' `trend', ab(comunacode2000) `se'
+    *outreg2 negTreat using "`out'", par excel lab bdec(3) se bracket nocons
 
     areg `y' `neg' `FE' `trend', ab(comunacode2000) `se'
     outreg2 `neg' using "`out'", par excel lab bdec(3) se bracket nocons
@@ -111,6 +111,7 @@ foreach y of varlist `yvars' {
         replace lCI = _b[`var']-1.96*_se[`var'] in `j'
         local ++j
     }
+    list est time uCI lCI in 1/10
     #delimit ;
     twoway line est time ||
            line uCI time, lpattern(dash) ||
@@ -130,6 +131,8 @@ restore
 ********************************************************************************
 preserve
 keep if posSamp==1
+gen time = _n-6 in 1/10
+replace time = time+1 in 5/10
 
 
 foreach y of varlist `yvars' {
@@ -149,6 +152,7 @@ foreach y of varlist `yvars' {
         replace lCI = _b[`var']-1.96*_se[`var'] in `j'
         local ++j
     }
+    list est time uCI lCI in 1/10
     #delimit ;
     twoway line est time ||
            line uCI time, lpattern(dash) ||
