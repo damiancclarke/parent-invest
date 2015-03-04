@@ -82,47 +82,11 @@ local se cluster(comunacode2000)
 
 local out $OUT/regression/EventStudy.xls
 
-********************************************************************************
-*** (3a) Good shock
-********************************************************************************
 cap rm "`out'"
 cap rm "$OUT/regression/EventStudy.txt"
-
-preserve
-keep if posSamp==1
-
 gen time = _n-6 in 1/10
 replace time = time+1 in 5/10
 
-foreach y of varlist `yvars' {
-    areg `y' posTreat `FE' `trend', ab(comunacode2000) `se'
-    outreg2 posTreat using "`out'", par excel lab bdec(3) se bracket nocons
-
-    areg `y' `pos' `FE' `trend', ab(comunacode2000) `se'
-    outreg2 `pos' using "`out'", par excel lab bdec(3) se bracket nocons
-
-    local j=1
-    gen est=.
-    gen uCI=.
-    gen lCI=.
-    foreach var of varlist `pos' {
-        replace est = _b[`var'] in `j'
-        replace uCI = _b[`var']+1.96*_se[`var'] in `j'
-        replace lCI = _b[`var']-1.96*_se[`var'] in `j'
-        local ++j
-    }
-    #delimit ;
-    twoway line est time ||
-           line uCI time, lpattern(dash) ||
-           line lCI time, lpattern(dash)
-           scheme(s1mono) ytitle("`y'") yline(0, lpattern(dot))
-           legend(order(1 "Point Estimate" 2 "95% CI"))
-           note("Year -1 is omitted as the base case.");
-    graph export "$OUT/graph/PositiveEvent_`y'.eps", as(eps) replace;
-    #delimit cr
-    drop est uCI lCI
-}
-restore
 
 ********************************************************************************
 *** (3b) Bad shock
@@ -154,10 +118,47 @@ foreach y of varlist `yvars' {
            scheme(s1mono) ytitle("`y'") yline(0, lpattern(dot))
            legend(order(1 "Point Estimate" 2 "95% CI"))
            note("Year -1 is omitted as the base case.");
-    graph export "$OUT/graph/NagativeEvent_`y'.eps", as(eps) replace;
+    graph export "$OUT/graph/NegativeEvent_`y'.eps", as(eps) replace;
     #delimit cr
     drop est uCI lCI
-
-
 }
 restore
+
+
+********************************************************************************
+*** (3a) Good shock
+********************************************************************************
+preserve
+keep if posSamp==1
+
+
+foreach y of varlist `yvars' {
+    areg `y' posTreat `FE' `trend', ab(comunacode2000) `se'
+    outreg2 posTreat using "`out'", par excel lab bdec(3) se bracket nocons
+
+    areg `y' `pos' `FE' `trend', ab(comunacode2000) `se'
+    outreg2 `pos' using "`out'", par excel lab bdec(3) se bracket nocons
+
+    local j=1
+    gen est=.
+    gen uCI=.
+    gen lCI=.
+    foreach var of varlist `pos' {
+        replace est = _b[`var'] in `j'
+        replace uCI = _b[`var']+1.96*_se[`var'] in `j'
+        replace lCI = _b[`var']-1.96*_se[`var'] in `j'
+        local ++j
+    }
+    #delimit ;
+    twoway line est time ||
+           line uCI time, lpattern(dash) ||
+           line lCI time, lpattern(dash)
+           scheme(s1mono) ytitle("`y'") yline(0, lpattern(dot))
+           legend(order(1 "Point Estimate" 2 "95% CI"))
+           note("Year -1 is omitted as the base case.");
+    graph export "$OUT/graph/PositiveEvent_`y'.eps", as(eps) replace;
+    #delimit cr
+    drop est uCI lCI
+}
+restore
+
