@@ -36,7 +36,10 @@ gen negSamp = byear>=1954 & byear<=1964 | byear>=1966 & byear<=1976 & T1!=1
 gen posTreat = T1==1&byear>=1971
 gen negTreat = T1==1&byear>=1959|T2==1&byear>=1971
 
-gen professional = occisco<=2 if occisco!=99
+gen professional     = occisco<=2 if occisco!=99
+gen technician       = occisco<=3 if occisco!=99
+gen technician_clark = occisco<=4 if occisco!=99
+
 
 ********************************************************************************
 *** (2b) Generate positive shock event years
@@ -69,26 +72,56 @@ foreach num of numlist 0(1)5 {
 ********************************************************************************
 *** (3) Event study
 ********************************************************************************
-local pos time_5 time_4 time_3 time_2 time0 time1 time2 time3 time4 time5
+local yvars professional technician technician_clark
+local pos time_5 time_4 time_3 time_2 time0 time2 time3 time4 time5
 local neg Ntime_5 Ntime_4 Ntime_3 Ntime_2 Ntime0 Ntime1 Ntime2 Ntime3 Ntime4 Ntime5
 
-local out $OUT/regression/EventStudy.xls
 local trend i.comunacode2000#c.byear
 local FE i.byear#i.regioncode2000
 local se cluster(comunacode2000)
 
+local out $OUT/regression/EventStudy.xls
+
 ********************************************************************************
 *** (3a) Good shock
 ********************************************************************************
+cap rm "`out'"
+cap rm "$OUT/regression/EventStudy.txt"
+
 preserve
 keep if posSamp==1
 
-areg professional posTreat `FE' `trend', ab(comunacode2000) `se'
-outreg2 posTreat using "`out'", par excel replace lab bdec(3) se bracket nocons
+gen time = _n-6 in 1/10
+replace time = time+1 in 5/10
 
-areg professional `pos' `FE' `trend', ab(comunacode2000) `se'
-outreg2 `pos' using "`out'", par excel append lab bdec(3) se bracket nocons
+foreach y of varlist `yvars' {
+    areg `y' posTreat `FE' `trend', ab(comunacode2000) `se'
+    outreg2 posTreat using "`out'", par excel lab bdec(3) se bracket nocons
 
+    areg `y' `pos' `FE' `trend', ab(comunacode2000) `se'
+    outreg2 `pos' using "`out'", par excel lab bdec(3) se bracket nocons
+
+    local j=1
+    gen est=.
+    gen uCI=.
+    gen lCI=.
+    foreach var of varlist `pos' {
+        replace est = _b[`var'] in `j'
+        replace uCI = _b[`var']+1.96*_se[`var'] in `j'
+        replace lCI = _b[`var']-1.96*_se[`var'] in `j'
+        local ++j
+    }
+    #delimit ;
+    twoway line est time ||
+           line uCI time, lpattern(dash) ||
+           line lCI time, lpattern(dash)
+           scheme(s1mono) ytitle("`y'") yline(0, lpattern(dot))
+           legend(order(1 "Point Estimate" 2 "95% CI"))
+           note("Year -1 is omitted as the base case.");
+    graph export "$OUT/graph/PositiveEvent_`y'.eps", as(eps) replace;
+    #delimit cr
+    drop est uCI lCI
+}
 restore
 
 ********************************************************************************
@@ -97,9 +130,34 @@ restore
 preserve
 keep if negSamp==1
 
-areg professional negTreat `FE' `trend', ab(comunacode2000) `se'
-outreg2 negTreat using "`out'", par excel replace lab bdec(3) se bracket nocons
+foreach y of varlist `yvars' {
+    areg `y' negTreat `FE' `trend', ab(comunacode2000) `se'
+    outreg2 negTreat using "`out'", par excel lab bdec(3) se bracket nocons
 
-areg professional `neg' `FE' `trend', ab(comunacode2000) `se'
-outreg2 `neg' using "`out'", par excel append lab bdec(3) se bracket nocons
+    areg `y' `neg' `FE' `trend', ab(comunacode2000) `se'
+    outreg2 `neg' using "`out'", par excel lab bdec(3) se bracket nocons
+
+    local j=1
+    gen est=.
+    gen uCI=.
+    gen lCI=.
+    foreach var of varlist `neg' {
+        replace est = _b[`var'] in `j'
+        replace uCI = _b[`var']+1.96*_se[`var'] in `j'
+        replace lCI = _b[`var']-1.96*_se[`var'] in `j'
+        local ++j
+    }
+    #delimit ;
+    twoway line est time ||
+           line uCI time, lpattern(dash) ||
+           line lCI time, lpattern(dash)
+           scheme(s1mono) ytitle("`y'") yline(0, lpattern(dot))
+           legend(order(1 "Point Estimate" 2 "95% CI"))
+           note("Year -1 is omitted as the base case.");
+    graph export "$OUT/graph/NagativeEvent_`y'.eps", as(eps) replace;
+    #delimit cr
+    drop est uCI lCI
+
+
+}
 restore
