@@ -29,7 +29,7 @@ global LOG "~/investigacion/2014/ParentalInvestments/log"
 global GEO "~/investigacion/2014/ParentalInvestments/data/Geo"
 
 cap mkdir "$OUT/graph"
-cap mkdir "$OUT/regressions"
+cap mkdir "$OUT/regression"
 
 log using "$LOG/eventStudy.txt", text replace
 
@@ -52,7 +52,7 @@ gen T2=birth_comuna=="tocopilla"|birth_comuna=="maria elena"|birth_comuna=="cala
 
 
 gen posSamp = byear>=1966 & byear<=1976 & T2!=1 | byear>=1974&byear<=1980
-gen negSamp = byear>=1954 & byear<=1964 | byear>=1961 & byear<=1976 & T1!=1
+gen negSamp = byear>=1954 & byear<=1964 | byear>=1966 & byear<=1976 & T1!=1
 
 gen posTreat = T1==1&byear>=1971
 gen negTreat = T1==1&byear>=1959|T2==1&byear>=1971
@@ -89,11 +89,11 @@ foreach num of numlist 0(1)5 {
 *** (2c) Generate negative shock event years
 ********************************************************************************
 foreach num of numlist 0(1)5 {
-    local Ayr = 1958+`num'
+    local Ayr = 1959+`num'
     local Byr = 1971+`num'
     gen negP`num' = byear==`Ayr'&T1==1 | byear==`Byr'&T2==1
     if `num'!= 0 {
-        local Ayr = 1958-`num'
+        local Ayr = 1959-`num'
         local Byr = 1971-`num'
         gen negN`num' = byear==`Ayr'&T1==1 | byear==`Byr'&T2==1
     }
@@ -118,8 +118,8 @@ gen time = _n-6 in 1/10
 
 
 foreach y of varlist `yvars' someCollege someUniversity {
-    *areg `y' posTreat `FE' `trend', ab(comunacode2000) `se'
-    *outreg2 posTreat using "`out'", par excel lab bdec(3) se bracket nocons
+    areg `y' posTreat `FE' `trend', ab(comunacode2000) `se'
+    outreg2 posTreat using "`out'", par excel lab bdec(3) se bracket nocons
 
     areg `y' `pos' `FE' `trend', ab(comunacode2000) `se'
     outreg2 `pos' using "`out'", par excel lab bdec(3) se bracket nocons
@@ -157,8 +157,8 @@ keep if negSamp==1
 gen time = _n-6 in 1/10
 
 foreach y of varlist `yvars' someCollege someUniversity {
-    *areg `y' negTreat `FE' `trend', ab(comunacode2000) `se'
-    *outreg2 negTreat using "`out'", par excel lab bdec(3) se bracket nocons
+    areg `y' negTreat `FE' `trend', ab(comunacode2000) `se'
+    outreg2 negTreat using "`out'", par excel lab bdec(3) se bracket nocons
 
     areg `y' `neg' `FE' `trend', ab(comunacode2000) `se'
     outreg2 `neg' using "`out'", par excel lab bdec(3) se bracket nocons
