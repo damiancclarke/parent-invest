@@ -38,17 +38,22 @@ local pos posN5 posN4 posN3 posN2 posP*
 local neg negN5 negN4 negN3 negN2 negP*
 
 local trend i.comunacode2000#c.byear
-local FE i.byear#i.regioncode2000
+local FE i.byear
 local se cluster(comunacode2000)
 
 ********************************************************************************
 *** (2) Open census, Generate variables
 ********************************************************************************
-use "$DAT/census2002_north"
+use "$DAT/census2002"
+keep if regioncode2000==2|regioncode2000==5
+
 
 gen byear=2002-age
-gen T1=birth_comuna=="antofagasta"|birth_comuna=="mejillones"
-gen T2=birth_comuna=="tocopilla"|birth_comuna=="maria elena"|birth_comuna=="calama"
+*gen T1=birth_comuna=="antofagasta"|birth_comuna=="mejillones"
+*gen T2=birth_comuna=="tocopilla"|birth_comuna=="maria elena"|birth_comuna=="calama"
+gen T1=name_noaccent=="Antofagasta"|name_noaccent=="Mejillones"
+gen T2=name_noaccent=="Tocopilla"|name_noaccent=="Maria Elena"|name_noaccent=="Calama"
+
 
 
 gen posSamp = byear>=1966 & byear<=1976 & T2!=1 | byear>=1974&byear<=1980
