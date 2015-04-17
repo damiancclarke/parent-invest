@@ -31,8 +31,8 @@ global GEO "~/investigacion/2014/ParentalInvestments/data/Geo"
 cap mkdir $OUT
 log using "$LOG/censusPrep.txt", text replace
 
-local indiv 0
-local house 1
+local indiv 1
+local house 0
 
 ********************************************************************************
 *** (2) Open file, merge comuna names
@@ -224,7 +224,13 @@ if `indiv'==1 {
     gen dismntl=(p20_4-2)*-1
     gen disable = p20_6 + 1
 
-                                        #delimit ;
+    tab p23a
+    tab p24a
+    gen livesHere  = p23a==1
+    gen livedHere  = p24a==1
+    gen noMigrator = livesHere==1 & livedHere==1
+    
+    #delimit ;
     lab def sex   1 "Male" 2 "Female";
     lab def rel   1 "Head" 2 "Spouse/partner" 3 "Child" 4 "Other Relative" 5
     "Non-relative";
@@ -262,7 +268,7 @@ if `indiv'==1 {
     12 "Same major, different minor admin unit" 20
     "Different major admin unit" 30 "Abroad" 99 "Unknown/missing";
     lab def dsb 1 "Disabled" 2 "Not Disabled" 9 "NIU (not in universe)";
-                                        #delimit cr
+    #delimit cr
 
     ****************************************************************************
     *** (5) Label
@@ -325,8 +331,10 @@ if `indiv'==1 {
     lab var disdeaf     "Deaf or hearing-impaired"
     lab var dismute     "Mute"
     lab var dismntl     "Mental disability"
-
-
+    lab var livesHere   "Person still lives in comuna of birth"
+    lab var livedHere   "Person lived in comuna of birth 5 years ago"
+    lab var noMigrator  "Person lives in birth comuna and lived here 5 yrs ago"
+    
     ****************************************************************************
     *** (6) Merge into old comuna names
     ****************************************************************************
@@ -347,8 +355,8 @@ if `indiv'==1 {
 
     lab dat "Chile 2002 Census, all people.  Cleaned and coded (Damian Clarke)"
     save "$OUT/census2002", replace
-    *keep if region2000<=4
-    *save "$OUT/census2002_r1_4", replace
+    keep if region2000<=4
+    save "$OUT/census2002_r1_4", replace
 }
 
 ********************************************************************************
