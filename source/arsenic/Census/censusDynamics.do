@@ -28,7 +28,8 @@ local Y schooling completeUniv* someUniv active employed professional technic
 use "$DAT/census2002_north"
 gen birthYear = 2002 - age
 keep if birthYear >= 1945 & birthYear <= 1975
-
+*set seed 27
+*sample 30
 
 gen T1 =  birth_comuna=="antofagasta"|birth_comuna=="mejillones"
 replace T1 = 2 if birth_comuna=="tocopilla"|birth_comuna=="maria Elena"|/*
@@ -49,6 +50,7 @@ gen technician   = occisco<=3 if occisco != 99
 ********************************************************************************
 *** (3) Birth cohort trends
 ********************************************************************************
+/*
 preserve
 collapse `Y', by(birthYear T1)
 foreach outcome of varlist `Y' {
@@ -82,11 +84,27 @@ foreach g in F M {
     }
 }
 restore
+*/
+********************************************************************************
+*** (4a) Regressions generate variables
+********************************************************************************
+gen InUtero = birthYear>=1959&birthYear<=1972 & T1==1
+
+foreach a of numlist 0(1)13 {
+    local lYear = 1958-`a'
+    local uYear = 1971-`a'
+    dis "low year is `lyear', high year is `uyear'"
+
+    gen Age`a' = birthYear>=`lyear' & birthYear<=`uyear' & T1==1
+    tab Age`a¿
+}
+
+
+
 
 ********************************************************************************
-*** (4) Regressions
+*** (4b) Regressions
 ********************************************************************************
-
 
 
 
