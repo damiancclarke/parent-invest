@@ -25,7 +25,7 @@ local Y schooling completeUniv* someUniv active employed professional technic
 ********************************************************************************
 *** (2) Use and set-up
 ********************************************************************************
-use "$DAT/census2002"
+use "$DAT/census2002_north"
 gen birthYear = 2002 - age
 keep if birthYear >= 1945 & birthYear <= 1975
 
@@ -49,6 +49,7 @@ gen technician   = occisco<=3 if occisco != 99
 ********************************************************************************
 *** (3) Birth cohort trends
 ********************************************************************************
+preserve
 collapse `Y', by(birthYear T1)
 foreach outcome of varlist `Y' {
     dis "Graphing `outcome'"
@@ -60,6 +61,34 @@ foreach outcome of varlist `Y' {
     graph export "$OUT/Trend_`outcome'.eps", replace as(eps);
     #delimit cr
 }
+
+restore
+preserve
+cap mkdir "$OUT/gender"
+gen gender = "F" if sex==2
+replace gender = "M" if sex==1
+
+collapse `Y', by(birthYear T1 gender)
+foreach g in F M {
+    foreach outcome of varlist `Y' {
+        dis "Graphing `outcome'"
+        #delimit ;
+        twoway line `outcome' birthYear if T1==1&gend=="`g'", lpattern(dash) ||
+               line `outcome' birthYear if T1==0&gend=="`g'", scheme(s1mono)
+        legend(lab(1 "Antofagasta/Mejillones") lab(2 "Rest of Regions I-IV"))
+        xtitle("Birth Year") xlabel(minmax) xline(1958 1971);
+        graph export "$OUT/gender/Trend_`outcome'_`g'.eps", replace as(eps);
+        #delimit cr
+    }
+}
+restore
+
+********************************************************************************
+*** (4) Regressions
+********************************************************************************
+
+
+
 
 ********************************************************************************
 *** (X) Clear
