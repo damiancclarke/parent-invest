@@ -25,20 +25,23 @@ local Y schooling completeUniv* someUniv active employed professional technic
 ********************************************************************************
 *** (2) Use and set-up
 ********************************************************************************
-use "$DAT/census2002_north"
+use "$DAT/census2002"
+set seed 27
+sample 30
+cap rename bplclName birth_comuna
+
+
 gen birthYear = 2002 - age
 keep if birthYear >= 1945 & birthYear <= 1975
-*set seed 27
-*sample 30
 
 gen T1 =  birth_comuna=="antofagasta"|birth_comuna=="mejillones"
 replace T1 = 2 if birth_comuna=="tocopilla"|birth_comuna=="maria Elena"|/*
                */ birth_comuna=="calama"
 
 gen schooling = yrschl if yrschl != 99
-gen completeUniversity5= p26a==15&p26b>=5
-gen completeUniversity4= p26a==15&p26b>=4
-gen someUniversity= p26a==15
+gen completeUniversity5= educcl==15 & p26b>=5
+gen completeUniversity4= educcl==15 & p26b>=4
+gen someUniversity= educcl==15
 
 gen active= empstat<=2
 gen employed= empstat==1
@@ -50,7 +53,6 @@ gen technician   = occisco<=3 if occisco != 99
 ********************************************************************************
 *** (3) Birth cohort trends
 ********************************************************************************
-/*
 preserve
 collapse `Y', by(birthYear T1)
 foreach outcome of varlist `Y' {
@@ -84,29 +86,31 @@ foreach g in F M {
     }
 }
 restore
-*/
+
 ********************************************************************************
 *** (4a) Regressions generate variables
 ********************************************************************************
-gen InUtero = birthYear>=1959&birthYear<=1972 & T1==1
+gen InUtero = birthYear>=1960&birthYear<=1972 & T1==1
 
-foreach a of numlist 0(1)13 {
-    local lYear = 1958-`a'
+foreach a of numlist 0(1)16 {
+    local lYear = 1959-`a'
     local uYear = 1971-`a'
-    dis "low year is `lyear', high year is `uyear'"
+    dis "low year is `lYear', high year is `uYear'"
 
-    gen Age`a' = birthYear>=`lyear' & birthYear<=`uyear' & T1==1
-    tab Age`a¿
+    gen Age`a' = birthYear>=`lYear' & birthYear<=`uYear' & T1==1
+    tab Age`a'
 }
-
-
 
 
 ********************************************************************************
 *** (4b) Regressions
 ********************************************************************************
+local se abs(birth_comuna) cluster(birth_comuna)
+*local cd if birthYear>=1955
 
-
+foreach var of varlist `Y' {
+    areg `var' i.birthYear i.regioncode2000#c.birthYear InUtero Age* `cd', `se'
+}
 
 ********************************************************************************
 *** (X) Clear
