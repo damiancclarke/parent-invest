@@ -351,11 +351,11 @@ if `indiv'==1 {
     *** (7) Save
     ****************************************************************************
     drop vn hn Portafolios p17 p27 Comuna birthComunaKnown p28 p30 p23a p23b  /*
-    */ p20_* p22a p23* p24* p25 p26b p28 p29 p30 p33* p36* x oldreg
+    */ p20_* p22a p23* p24* p25 p28 p29 p30 p33* p36* x oldreg
 
     lab dat "Chile 2002 Census, all people.  Cleaned and coded (Damian Clarke)"
     save "$OUT/census2002", replace
-    keep if region2000<=4
+    keep if regioncode2000<=4
     save "$OUT/census2002_r1_4", replace
 }
 
