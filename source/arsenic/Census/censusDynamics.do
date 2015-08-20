@@ -4,6 +4,8 @@
 Takes census data to create trends and to examine the dynamic effects of the ar-
 senic reform in Antofagasta in 1959/1971.
 
+Currently, this is a 30% sample of the rest of the country, rather than all peo-
+ple (see sampler variable)
 */
 
 vers 11
@@ -15,7 +17,7 @@ cap log close
 *** (1) globals and locals
 ********************************************************************************
 global DAT "~/investigacion/2014/ParentalInvestments/data/census"
-global OUT "~/investigacion/2014/ParentalInvestments/results/arsenic/census/dynamics"
+global OUT "~/investigacion/2014/ParentalInvestments/results/arsenic/census/dynamics/r1_4"
 global LOG "~/investigacion/2014/ParentalInvestments/log"
 
 cap mkdir $OUT
@@ -26,17 +28,19 @@ local Y schooling completeUniv* someUniv active employed professional technic
 *** (2) Use and set-up
 ********************************************************************************
 use "$DAT/census2002"
-set seed 27
-sample 30
 cap rename bplclName birth_comuna
-
-
 gen birthYear = 2002 - age
 keep if birthYear >= 1945 & birthYear <= 1975
+keep if geo1b_cl < 5
+*keep if geo1b_cl==2
 
-gen T1 =  birth_comuna=="antofagasta"|birth_comuna=="mejillones"
+generat T1 = 0
+replace T1 = 1 if  birth_comuna=="antofagasta"|birth_comuna=="mejillones"
 replace T1 = 2 if birth_comuna=="tocopilla"|birth_comuna=="maria Elena"|/*
                */ birth_comuna=="calama"
+*gen sampler = runiform() if T1 == 0
+*keep if sampler>=0.7
+*drop sampler
 
 gen schooling = yrschl if yrschl != 99
 gen completeUniversity5= educcl==15 & p26b>=5
@@ -58,10 +62,10 @@ collapse `Y', by(birthYear T1)
 foreach outcome of varlist `Y' {
     dis "Graphing `outcome'"
     #delimit ;
-    twoway line `outcome' birthYear if T1==1, lpattern(dash) ||
-           line `outcome' birthYear if T1==0, scheme(s1mono)
-    legend(label(1 "Antofagasta/Mejillones") label(2 "Rest of Region I-IV"))
-    xtitle("Birth Year") xlabel(minmax) xline(1958 1971);
+    twoway connected `outcome' birthYear if T1==1, lpattern(dash) ||
+           connected `outcome' birthYear if T1==0, scheme(s1mono)
+    legend(label(1 "Antofagasta/Mejillones") label(2 "Rest of Regions I-IV"))
+    xtitle("Birth Year") xlabel(1945[5]1975, angle(55)) xline(1958 1971);
     graph export "$OUT/Trend_`outcome'.eps", replace as(eps);
     #delimit cr
 }
@@ -77,16 +81,16 @@ foreach g in F M {
     foreach outcome of varlist `Y' {
         dis "Graphing `outcome'"
         #delimit ;
-        twoway line `outcome' birthYear if T1==1&gend=="`g'", lpattern(dash) ||
-               line `outcome' birthYear if T1==0&gend=="`g'", scheme(s1mono)
+        twoway connected `outcome' birthYear if T1==1&gend=="`g'", lpattern(dash) ||
+               connected `outcome' birthYear if T1==0&gend=="`g'", scheme(s1mono)
         legend(lab(1 "Antofagasta/Mejillones") lab(2 "Rest of Regions I-IV"))
-        xtitle("Birth Year") xlabel(minmax) xline(1958 1971);
+        xtitle("Birth Year") xlabel(1945[5]1975, angle(55)) xline(1958 1971);
         graph export "$OUT/gender/Trend_`outcome'_`g'.eps", replace as(eps);
         #delimit cr
     }
 }
 restore
-
+exit
 ********************************************************************************
 *** (4a) Regressions generate variables
 ********************************************************************************
