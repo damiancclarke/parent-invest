@@ -62,6 +62,8 @@ gen professional = occisco<=2 if occisco != 99
 gen technician   = occisco==3 if occisco != 99
 
 egen comunaYear=group(comunacode2000 birthYear)
+gen female = sex==2
+gen male   = sex==1
 
 ********************************************************************************
 *** (3) Regressions
@@ -115,6 +117,63 @@ foreach samp in Region2All Region1_4All Region2NoMig Region1_4NoMig {
     restore
     local ++i
 }
+
+********************************************************************************
+*** (3a) Regressions (gender)
+********************************************************************************
+foreach sex in female male {
+local i=1
+foreach samp in Region2All Region1_4All Region2NoMig Region1_4NoMig {
+    if `i'==1 local snote "residents of region II"
+    if `i'==2 local snote "residents of regions I-IV"
+    if `i'==3 local snote "non-migrating residents of region II"
+    if `i'==4 local snote "non-migrating residents of region I-IV"
+    
+    preserve
+    keep if `samp'==1&`sex'==1
+
+    foreach y of local Y {
+        eststo: areg `y' Arsenic i.birthYear , `se'
+    }
+    #delimit ;
+    esttab est1 est2 est3 est4 est5 est6 est7 using "$OUT/`sex'`samp'FE.tex",
+    replace `estopt' booktabs title("Arsenic and Long Run Outcomes (`sex')")
+    keep(Arsenic) mlabels(, depvar) style(tex)
+    postfoot("\bottomrule \multicolumn{8}{p{18cm}}{\begin{footnotesize}    "
+             "\textsc{Notes:} Sample consists of all `sex' `snote' born    "
+             "between 1952 and 1968 (aged between 34 and 50 at the time of "
+             "the census).  Birth comuna and year fixed effects are        "
+             "included. Standard errors allow for arbitrary correlations   "
+             "within each comuna and birth cohort."
+             "\end{footnotesize}}\end{tabular}\end{table}");
+    #delimit cr
+    estimates clear
+
+    foreach y of local Y {
+        eststo: areg `y' Arsenic i.birthYear i.T1#c.birthYear, `se'
+    }
+    #delimit ;
+    esttab est1 est2 est3 est4 est5 est6 est7 using "$OUT/`sex'`samp'Trend.tex",
+    replace `estopt' booktabs title("Arsenic and Long Run Outcomes (`sex')")
+    keep(Arsenic) mlabels(, depvar) style(tex)
+    postfoot("\bottomrule \multicolumn{8}{p{18cm}}{\begin{footnotesize}   "
+             "\textsc{Notes:} Sample consists of all `sex' `snote' born   "
+             "between 1952 and 1968 (aged between 34 and 50 at the time of"
+             "the census).  Birth comuna and year fixed effects are       "
+             "included, as well as comuna-specific linear time trends.    "
+             "Standard errors allow for arbitrary correlations within each"
+             "comuna and birth cohort."
+             "\end{footnotesize}}\end{tabular}\end{table}");
+    #delimit cr
+    estimates clear
+    restore
+    local ++i
+}
+}
+
+
+
+
 exit
 
 
