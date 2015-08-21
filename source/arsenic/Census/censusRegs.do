@@ -44,10 +44,11 @@ replace T1 = 2 if birthComuna=="tocopilla"|birthComuna=="maria Elena"|/*
                */ birthComuna=="calama"
 
 gen Region2All     = geo1b_cl==2               if T1!=2
-gen Region1_4All   = geo1b_c1<=4               if T1!=2
+gen Region1_4All   = geo1b_cl<=4               if T1!=2
 gen Region2NoMig   = geo1b_cl==2&noMigrator==1 if T1!=2
 gen Region1_4NoMig = geo1b_cl>=4&noMigrator==1 if T1!=2
 gen Arsenic = T1                               if T1!=2
+replace Arsenic = 0 if birthYear<1959
 
 gen schooling = yrschl if yrschl != 99
 gen completeUniversity5= educcl==15 & p26b>=5
@@ -78,7 +79,7 @@ foreach samp in Region2All Region1_4All Region2NoMig Region1_4NoMig {
     keep if `samp'==1
 
     foreach y of local Y {
-        eststo: areg y Arsenic i.birthyYear , `se'
+        eststo: areg `y' Arsenic i.birthYear , `se'
     }
     #delimit ;
     esttab est1 est2 est3 est4 est5 est6 est7 using "$OUT/`samp'FE.tex",
@@ -95,7 +96,7 @@ foreach samp in Region2All Region1_4All Region2NoMig Region1_4NoMig {
     estimates clear
 
     foreach y of local Y {
-        eststo: areg y Arsenic i.birthYear i.comunacode2000#c.birthYear, `se'
+        eststo: areg `y' Arsenic i.birthYear i.T1#c.birthYear, `se'
     }
     #delimit ;
     esttab est1 est2 est3 est4 est5 est6 est7 using "$OUT/`samp'Trend.tex",
